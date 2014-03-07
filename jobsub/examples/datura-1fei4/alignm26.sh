@@ -98,6 +98,10 @@ ResidualsRMax="0.5"
 
 
 
+#exit
+
+
+
 echo "starting XY shifts/rotations"
 #do=""
  for x in {1..10}; do
