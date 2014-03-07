@@ -102,6 +102,10 @@ ResidualsRMax="0.5"
 
 
 
+#exit
+
+
+
 echo "starting XY shifts/rotations"
 #do=""
  for x in {1..10}; do
@@ -158,6 +162,7 @@ echo ${gear1}" to "$gear2
 
 #########################
 $do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber"  -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="$gear1"  -o GearAlignedFile="$gear2"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres"  -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-tilts-$x" aligngbl $RUN
+####
 ####
 ####
 echo "file: $file"
