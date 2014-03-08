@@ -379,7 +379,7 @@ namespace eutelescope {
     }
 
     double EUTelGBLFitter::interpolateTrackX(const EVENT::TrackerHitVec& trackCand, const double z) const {
-        const int planeIDStart = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >(trackCand.front()) );
+         const int planeIDStart = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >(trackCand.front()) );
         const double* hitPointLocalStart = trackCand.front()->getPosition();
         double hitposStart[] = {hitPointLocalStart[0],hitPointLocalStart[1],hitPointLocalStart[2]};
         double hitPointGlobalStart[] = {0.,0.,0.};
@@ -658,7 +658,7 @@ namespace eutelescope {
         EVENT::TrackerHitVec::const_iterator itrHit;
         for ( itrHit = trackCandidate.begin(); itrHit != trackCandidate.end(); ++itrHit ) {
             const int planeID = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >(*itrHit) );
-             
+
             bool excludeFromFit = false;
             if ( std::find( _excludeFromFit.begin(), _excludeFromFit.end(), planeID ) != _excludeFromFit.end() ) excludeFromFit = true;
             if(excludeFromFit)
@@ -864,7 +864,7 @@ namespace eutelescope {
             EVENT::TrackerHitVec::const_reverse_iterator itHit;
             for ( itHit = hits.rbegin(); itHit != hits.rend(); ++itHit) {
                 const int planeID = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >(*itHit) );
-		if ( planeID < 0 ) streamlog_out( WARNING2 ) << "Can't guess sensor ID. Check supplied hits." << std::endl;
+     	 	if ( planeID < 0 ) streamlog_out( WARNING2 ) << "Can't guess sensor ID. Check supplied hits." << std::endl;
 
                 // Go to global coordinates
                 const double* hitPointLocal = (*itHit)->getPosition();

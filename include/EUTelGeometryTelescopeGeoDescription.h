@@ -47,6 +47,9 @@ namespace eutelescope {
 
     namespace geo {
 
+        const Double_t PI = 3.141592653589793;
+        const Double_t DEG = 180./PI;
+ 
         class EUTelGeometryTelescopeGeoDescription {
             
         private:
@@ -139,7 +142,9 @@ namespace eutelescope {
             float findRadLengthIntegral( const double[], const double[], bool );
             
             int getSensorID( const float globalPos[] ) const;
-            
+           
+            int getSensorID( const IMPL::TrackerHitImpl* ) const;
+ 
             void local2Master( int, const double[], double[] );
             
             void master2Local( const double[], double[] );
@@ -235,6 +240,9 @@ namespace eutelescope {
             /** Geometry manager global object */
             TGeoManager* _geoManager;
             //#endif // USE_TGEO
+
+            int findNextPlaneEntrance(  double* ,  double *, int, float*  );
+
 
         };
         
