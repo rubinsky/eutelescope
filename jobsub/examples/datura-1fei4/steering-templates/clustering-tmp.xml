@@ -201,6 +201,8 @@ Version: $Id: clusearch-tmp.xml,v 1.9 2009-08-01 10:41:44 bulgheroni Exp $
     <parameter name="ResidualsYMax" type="FloatVec">  20.  20.  20.        20.0    20.0  20.0  20.0          </parameter>
     <parameter name="ResidualsYMin" type="FloatVec"> -20. -20. -20.       -20.0   -20.0 -20.0 -20.0          </parameter>
 
+    <!--Name of histogram info xml file-->
+    <parameter name="HistogramInfoFilename" type="string" value="@HistoInfoFile@"/>
   </processor>
 
   <processor name="HotPixelKiller" type="EUTelHotPixelKiller">

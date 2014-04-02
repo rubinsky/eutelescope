@@ -34,8 +34,8 @@ Chi2Cut="500."
 
 
 r="0.25000";
-rfei4x="0.050"
-rfei4y="0.250"
+rfei4x="0.500"
+rfei4y="2.500"
 xres="$r $r $r $rfei4x $r $r $r";
 yres="$r $r $r $rfei4y $r $r $r";
 
@@ -52,9 +52,9 @@ fi
 
 #  for x in `seq 10 30 2`; do
 #echo $x
-Fxr="0 1 2 20 3 4 5"
+Fxr="0     20     5"
 Fxs="0     20     5"
-Fyr="0 1 2 20 3 4 5"
+Fyr="0     20     5"
 Fys="0     20     5"
 Fzr="0     20      "
 Fzs="0 1 2 20 3 4 5"
@@ -67,7 +67,7 @@ ResidualsRMax="10.0"
 
 for x in {1..10}; do
 
-$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber" -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes"                         -o GearAlignedFile="${gear[1]}"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres" -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-XY-0" aligngbl $RUN
+$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber" -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes"                         -o GearAlignedFile="${gear[1]}"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres" -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-m26-" aligngbl $RUN
 
 chi2string=`unzip  -p  $file |grep -i chi`
 echo $chi2string
@@ -105,7 +105,7 @@ gear1=${gear[x]}
 gear2=${gear[x+1]}
 echo $gear1" to "$gear2
 #########################
-$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber" -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="${gear1}"  -o GearAlignedFile="${gear2}"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres" -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-XY-$x" aligngbl $RUN
+$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber" -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="${gear1}"  -o GearAlignedFile="${gear2}"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres" -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-m26-XY-$x" aligngbl $RUN
 
 rejected=`unzip  -p  $file |grep "Too many rejects" |cut -d '-' -f2`; 
 echo "at $x rejected?$rejected;;;"
@@ -133,7 +133,7 @@ else
  echo " rejected?$rejected: continue reducing sensor resolution"
  echo "alignment is converging continue reducing sensor resolution "
 #
- if [[  $(echo "$prev > 0.010"|bc) -eq 1 ]];then
+ if [[  $(echo "$prev > 0.001"|bc) -eq 1 ]];then
    r=$(echo "scale=4;$prev/2.0"|bc);
    prev=$r; 
    xres="$r $r $r $rfei4x $r $r $r"
@@ -147,7 +147,7 @@ fi
 #########################
    done
 
-exit 0;
+#exit 0;
 
 #
 Fxr="0     20     5"
@@ -159,9 +159,12 @@ Fzs="0 1 2 20 3 4 5"
 
 
 r="0.050";
+ prev=$r; 
+ xres="$r $r $r $rfei4x $r $r $r"
+ yres="$r $r $r $rfei4y $r $r $r"
 
 #pede="chiscut 500. 50. "
-Chi2Cut="500."
+Chi2Cut="30."
 
 
 for x in {11..20}; do
@@ -170,8 +173,10 @@ gear1=${gear[x]}
 gear2=${gear[x+1]}
 echo ${gear1}" to "$gear2
 
+ echo "iteration $x with xres: $xres"
+
 #########################
-$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber"  -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="$gear1"  -o GearAlignedFile="$gear2"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres"  -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-tilts-$x" aligngbl $RUN
+$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber"  -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="$gear1"  -o GearAlignedFile="$gear2"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres"  -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-m26-tilts-$x" aligngbl $RUN
 ####
 rejected=`unzip  -p  $file |grep "Too many rejects" |cut -d '-' -f2`; 
 echo " rejected? $rejected"
@@ -197,7 +202,7 @@ else
  echo " rejected? "$rejected
  echo "alignment is converging continue reducing sensor resolution "
 #
- if [[  $(echo "$prev > 0.010"|bc) -eq 1 ]];then
+ if [[  $(echo "$prev > 0.006"|bc) -eq 1 ]];then
    r=$(echo "scale=4;$prev/2.0"|bc);
    prev=$r; 
    xres="$r $r $r $rfei4x $r $r $r"
@@ -233,7 +238,7 @@ gear2=${gear[x+1]}
 echo ${gear1}" to "$gear2
 
 #########################
-$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber"  -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="$gear1"  -o GearAlignedFile="$gear2"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres"  -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-z-$x" aligngbl $RUN
+#$do jobsub.py  $DRY -c config.cfg -csv $RUNLIST -o ResidualsRMax="$ResidualsRMax" -o MaxRecordNumber="$MaxRecordNumber"  -o AlignPlaneIds="$AlignPlaneIds" -o Planes="$Planes" -o GearFile="$gear1"  -o GearAlignedFile="$gear2"  -o xResolutionPlane="$xres" -o yResolutionPlane="$yres"  -o AlignmentMode="$amode"   -o FixXrot="${Fxr}" -o FixXshifts="${Fxs}"  -o FixYrot="${Fyr}" -o FixYshifts="${Fys}" -o FixZrot="${Fzr}" -o FixZshifts="${Fzs}" -o Chi2Cut="$Chi2Cut"  -o pede="$pede" -o suffix="-m26-z-$x" aligngbl $RUN
 ####
 
 done
