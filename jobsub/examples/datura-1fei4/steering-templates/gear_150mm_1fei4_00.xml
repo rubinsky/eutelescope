@@ -10,6 +10,7 @@
 			<siplanesID ID="225"/>
 			<siplanesType type="TelescopeWithoutDUT"/>
 			<siplanesNumber number="7"/>
+			<siplanesMaterial number="7"/>
 			<layers>
 				<!--Eudet-Plane 0 - EUD0 -->
 				<layer>

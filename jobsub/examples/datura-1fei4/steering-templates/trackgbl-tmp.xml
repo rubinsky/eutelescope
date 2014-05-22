@@ -17,7 +17,7 @@
 
    <execute>
       <processor name="AIDA"/>
-      <processor name="TrackSearch"/>
+      <!-- processor name="TrackSearch"/ -->
       <!-- processor name="GBLTrackFit"/ -->
       <group name="GBLTrackFit"/>
       <processor name="Save"/>
@@ -25,8 +25,8 @@
    </execute>
 
    <global>
-      <!-- parameter name="LCIOInputFiles"> @LcioPath@/@FilePrefix@-trackcand.slcio </parameter -->
-      <parameter name="LCIOInputFiles"> @LcioPath@/@FilePrefix@-hitlocal.slcio </parameter>
+      <parameter name="LCIOInputFiles"> @LcioPath@/@FilePrefix@-trackcand.slcio </parameter>
+      <!-- parameter name="LCIOInputFiles"> @LcioPath@/@FilePrefix@-hitlocal.slcio </parameter -->
       <parameter name="GearXMLFile" value="@GearFilePath@/@GearAlignedFile@"/>
       <parameter name="MaxRecordNumber" value="@MaxRecordNumber@"/>
       <parameter name="SkipNEvents" value="@SkipNEvents@"/>

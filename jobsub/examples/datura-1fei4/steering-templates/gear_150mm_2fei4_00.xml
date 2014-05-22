@@ -10,6 +10,7 @@
 			<siplanesID ID="225"/>
 			<siplanesType type="TelescopeWithoutDUT"/>
 			<siplanesNumber number="8"/>
+			<parameter name="SimulatorName" type="StringVec" value="a0 a1 b0 b1 c0 c1 "/>
 			<layers>
 			<!--APIX-Plane 1 - FE-I4 3D  -->
 					<layer>
