@@ -10,6 +10,7 @@
 #include "TLine.h"
 #include "TLegend.h"
 #include "TMath.h"
+#include "TPaveText.h"
 
 #include <sstream>
 
@@ -137,6 +138,17 @@ return  token;
 void read_DATURA()
 {
 
+vthr[ 3] = 3.7;
+vthr[ 4] = 3.7;
+vthr[ 5] = 3.5;
+vthr[ 6] = 3.5;
+vthr[ 7] = 3.5;
+vthr[ 8] = 3.8;
+vthr[ 9] = 4.0;
+vthr[10] = 4.1;
+vthr[11] = 4.2;
+vthr[12] = 4.3;
+
 
 //  1   2       3   4     5 6   7       8     9     10     11    12    13    14     7+8      
 //   20 beam:  2.00 thr:  4 ::  0[07.24 00.05 07.32 00.06  2.016 0.008 2.008 0.008] 1[04.22 00.03 04.35 00.03  2.048 0.008 2.055 0.008] 2[04.48 00.03 04.51 00.03  2.029 0.008 2.026 0.008] 3[04.52 00.03 04.52 00.03  2.016 0.008 2.025 0.008] 4[04.44 00.03 04.48 00.03  1.999 0.008 2.013 0.008] 5[07.23 00.06 07.26 00.05  2.002 0.008 2.005 0.008]  0 00.00 00.00 00.00 00.00     1 00.00 00.00 00.00 00.00     2 00.00 00.00 00.00 00.00     3 00.00 00.00 00.00 00.00     4 00.00 00.00 00.00 00.00     5 00.00 00.00 00.00 00.00   
@@ -231,12 +243,13 @@ for(int isensor = 0; isensor<nplanes; isensor++)
              
                   Double_t value  = i3->second;
                   Double_t value2 = value*value; 
-                  Double_t vthr1 = 0.;//4.0;//vthr[i2->second]  ;
+                  Double_t vthr1 = vthr[i2->first]  ; // correct for intrinsic resolution of Mimosa26
                   Double_t vthr2 = vthr1*vthr1      ;
                   Double_t pres = sqrt( value2 - vthr2 );
                   Int_t ipoint = g->GetN(); 
                   g->SetPoint( ipoint, (ibeam)/10., pres ) ;
-                  g->SetPointError( ipoint, (ibeam)/10.*0.05, ermeasurement[idz][ibeam][ithr][isensor] ) ;
+//                  g->SetPointError( ipoint, (ibeam)/10.*0.05, ermeasurement[idz][ibeam][ithr][isensor] ) ;
+                  g->SetPointError( ipoint, (ibeam)/10.*0.05, 0.3 ) ;
                   g->SetLineWidth(3);
  
                   if(
@@ -255,7 +268,8 @@ for(int isensor = 0; isensor<nplanes; isensor++)
                   Int_t hpoint = h->GetN(); 
 //                  std::cout<< " hpoint: " << idz << " " << ithr << " " << ibeam << " " << (isensor*idz)*1. << " " << pres << std::endl; 
                   h->SetPoint( hpoint, (isensor*idz)*1., pres ) ;
-                  h->SetPointError( hpoint, 1.0, ermeasurement[idz][ibeam][ithr][isensor] ) ;
+                h->SetPointError( hpoint, 1.0, ermeasurement[idz][ibeam][ithr][isensor] ) ;
+//                  h->SetPointError( hpoint, 1.0, 0.2 ) ;
                   h->SetLineWidth(3);
 //                  h->Print();
           }
@@ -337,8 +351,8 @@ if(iss >> s >> dz >> s >> dz2 >> s >> ddut >> s >> pbeam >> res >> s >> s
 if(dz == dz2 && dz2 == ddut )
 {
 printf( "%3d %3d %3d  p:%7.2f %3.1f ", dz, dz2, ddut, pbeam, res); 
-printf( " tel0:%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f ", tel[0],tel[1],tel[2],tel[3],tel[4],tel[5],tel[6] );
-printf( " tel0:%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f ", biased[0],biased[1],biased[2],biased[3],biased[4],biased[5],biased[6] );
+//printf( " tel0:%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f ", tel[0],tel[1],tel[2],tel[3],tel[4],tel[5],tel[6] );
+//printf( " tel0:%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f ", biased[0],biased[1],biased[2],biased[3],biased[4],biased[5],biased[6] );
 //printf( " dutth: %3.1f ", ddutth);
 //printf( " th1: %5.2f %5.2f %5.2f %5.2f %5.2f ", thx[1], thx[2], thx[3], thx[4], thx[5] );
 //printf( " sith: %3.1f kapton:%5.1f",dsith, dkapton  );  
@@ -357,7 +371,7 @@ int idkapton = static_cast<int>(dkapton*10);
 
 for(int isensor=0;isensor<nplanes;isensor++)
 {
- pointresolution[dz][dz2][ddut][ibeam][ires][idutth][isith][isensor][idkapton]  = biased[isensor];//tel[3];
+ pointresolution[dz][dz2][ddut][ibeam][ires][idutth][isith][isensor][idkapton]  = tel[3] ;//pointing resolution // biased[isensor];//tel[3];
       scattering[dz][dz2][ddut][ibeam][ires][idutth][isith][isensor][idkapton]  = thx[isensor];
 }
 
@@ -569,21 +583,21 @@ void book_graphics()
    leg->SetFillColor(0);
 
 
-   iline02 = new TLine(2.4,1.,2.4,20.);
+   iline02 = new TLine(2.4,0.9,2.4,50.);
    iline02->SetLineColor(kRed);
    iline02->SetLineWidth(1);
-   iline03 = new TLine(3.6,1.,3.6,20.);
+   iline03 = new TLine(3.6,0.9,3.6,50.);
    iline03->SetLineColor(kRed);
    iline03->SetLineWidth(1);
-   iline05 = new TLine(6.0,1.,6.0,20.);
+   iline05 = new TLine(6.0,0.9,6.0,50.);
    iline05->SetLineColor(kRed);
    iline05->SetLineWidth(1);
 
-   iline15 = new TLine(15.,1.,15.,20.);
+   iline15 = new TLine(15.,0.9,15.,50.);
    iline15->SetLineColor(kRed);
    iline15->SetLineWidth(1);
 
-   iline120 = new TLine(120.,1.,120.,20.);
+   iline120 = new TLine(120.,0.9,120.,50.);
    iline120->SetLineColor(kRed);
    iline120->SetLineWidth(1);
 
@@ -615,14 +629,16 @@ void book_graphics()
    c1 = new TCanvas("c1","A Simple Graph with error bars",10,10,1000,1000);
    c1->SetGrid();
 
-   h1=new TH1D("h1",";(beam momentum) p, GeV; #sigma_{pointing @ plane 3}, #mum",1,0.1,1000.);
+   h1=new TH1D("h1",";(beam momentum) p, GeV; #sigma_{pointing @ plane 3}, #mum",1,0.6,1000.);
    h1->SetMaximum( 50.);
-   h1->SetMinimum(1.0);
+   h1->SetMinimum(0.9);
+   h1->GetXaxis()->SetTitleOffset(1.3);
+   h1->GetYaxis()->SetTitleOffset(0.8);
 
    c2 = new TCanvas("c2","A Simple Graph with error bars",10,10,1000,1000);
    c2->SetGrid();
 
-   h2 = new TH1D("h2",";(beam momentum) p, GeV; #sigma_{track slope @ plane 3}, #murad",1,0.1,1000.);
+   h2 = new TH1D("h2",";(beam momentum) p, GeV; #sigma_{track slope @ plane 3}, #murad",1,0.6,1000.);
    h2->SetMaximum( 4.);
    h2->SetMinimum(0.001);
 
@@ -1497,7 +1513,7 @@ std::cout << "ithr" << ithr << std::endl;
 c1->cd();
 
 
-for(int resthr=35;resthr<45;resthr=resthr+1)
+for(int resthr=38;resthr<39;resthr=resthr+1)
 {
 int dsith=50;
 int idkapton=250;
@@ -1519,19 +1535,18 @@ int iplane=3;
    iline15->Draw();
    iline120->Draw();
    leg->Clear();
-   leg->AddEntry("","Seven telescope planes [0 to 6]:","");
-   leg->AddEntry("","#Deltaz_{01} = #Deltaz_{56}","");
-   leg->AddEntry("","#Deltaz_{12} = #Deltaz_{45}","");
-   leg->AddEntry("","#Deltaz_{23} = #Deltaz_{34}","");
-   leg->AddEntry("","configuration tags: #Deltaz_{01}#Deltaz_{12}#Deltaz_{23}","");
-   leg->AddEntry("","with N [#Deltaz= 20 mm], W [#Deltaz= 150 mm]","");
+   leg->AddEntry("","Equidistant telescope setup","");
+   leg->AddEntry("","plane #3 is treated as DUT","");
+   leg->AddEntry("","tracking with 5 planes","");
+   leg->AddEntry("","Mimosa26 intrinsic resolution 3.8 #mum","");
+   leg->AddEntry("","distance between the planes:","");
 
    iline++;
 
 
    jc2=0;
  
-   int  iloop[] = {10,20,40,80,150};
+   int  iloop[] = {10,20,40,150};
    std::vector<int> vloop (iloop, iloop + sizeof(iloop) / sizeof(iloop[0]) );   
 
 for(int idist=10;idist<160;idist=idist+10)
@@ -1548,8 +1563,11 @@ for(int idist=10;idist<160;idist=idist+10)
    TGres[idist][idist][idist][resthr][dsith][dsith][iplane][idkapton]->SetLineStyle( 1 );
    TGres[idist][idist][idist][resthr][dsith][dsith][iplane][idkapton]->DrawClone("plsame");
 
-   leg->AddEntry(TGres[idist][idist][idist] [resthr][dsith][dsith][iplane][idkapton],"--- ","l");
 }
+   leg->AddEntry(TGres[ 10][ 10][ 10] [resthr][dsith][dsith][iplane][idkapton],"#Deltaz=  10 mm ","l");
+   leg->AddEntry(TGres[ 20][ 20][ 20] [resthr][dsith][dsith][iplane][idkapton],"#Deltaz=  20 mm ","l");
+   leg->AddEntry(TGres[ 40][ 40][ 40] [resthr][dsith][dsith][iplane][idkapton],"#Deltaz=  40 mm ","l");
+   leg->AddEntry(TGres[150][150][150] [resthr][dsith][dsith][iplane][idkapton],"#Deltaz= 150 mm ","l");
 
 
    jc1=1;
@@ -1575,15 +1593,23 @@ for(int idist=10;idist<160;idist=idist+10)
             if( i3->first != iplane  ) continue; 
 //            std::cout  << " " << i0->first << " " << i2->first<< " " << i3->first << std::endl;
             TGmeas[i0->first][i2->first][i3->first]->SetMarkerStyle(20+jc2++);        
-            TGmeas[i0->first][i2->first][i3->first]->SetMarkerColor(kRed+jc1);        
-            TGmeas[i0->first][i2->first][i3->first]->SetMarkerSize(1);        
+            int icolor=0;
+            if(jc1==0) icolor=kRed;
+            if(jc1<0) icolor=kBlue;
+            TGmeas[i0->first][i2->first][i3->first]->SetMarkerColor(icolor);        
+            TGmeas[i0->first][i2->first][i3->first]->SetMarkerSize(1.5);        
             TGmeas[i0->first][i2->first][i3->first]->Draw("P same"); 
-          }
+         }
        }
      }
    }
 
 
+   TPaveText *pt = new TPaveText(1.0,1.1,700.0,1.3);
+
+   pt->AddText("Preliminary // work in progress.");
+
+   pt->Draw();
 
    leg->Draw();
    TString s1="log_1_w_Material_presolution_thr_"+SSTR(ithr)+"_"+SSTR(resthr);//+"_"+SSTR(iplane);
@@ -1592,6 +1618,7 @@ for(int idist=10;idist<160;idist=idist+10)
 }
 }
 
+ 
 }
 
 
