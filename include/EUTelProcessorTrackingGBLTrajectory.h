@@ -116,7 +116,26 @@ namespace eutelescope {
         /** Parameter ids */
         map<int,int> _zRotationsMap;
         
-       
+        
+        /** Mille binary filename */
+        string _milleBinaryFilename;
+
+        /** Mille steering filename */
+        string _milleSteeringFilename;
+
+        /** Mille result filename */
+        string _milleResultFileName;
+        
+        /** GEAR new filename */
+        string _gear_aligned_file;
+
+
+        /** Allows user-added commands in the pede steering file */
+        StringVec _pedeSteerAddCmds;
+        
+        /** Alignment plane ids*/
+        IntVec _alignmentPlaneIds;
+        
         /** plane ids*/
         IntVec _planeIds;
  
@@ -133,6 +152,14 @@ namespace eutelescope {
        
         /** Maximum value of track chi2 for millipede */
         double _maxChi2Cut;
+
+        /** Automatic pede run flag*/
+        bool _runPede;
+        
+        /** Alignment constants file name */
+        string _alignmentConstantLCIOFile;
+        
+
 
         /** TGeo geometry file name */
         string _tgeoFileName;

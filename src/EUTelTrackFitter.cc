@@ -47,6 +47,10 @@ namespace eutelescope {
 	return;
     }
 
+    void EUTelTrackFitter:: PerformMille() {
+        return;
+    }
+
     void EUTelTrackFitter:: PerformFitGBLTrajectories() {
         return;
     }

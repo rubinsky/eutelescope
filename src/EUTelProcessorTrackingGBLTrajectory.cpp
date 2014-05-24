@@ -112,6 +112,7 @@ _histoInfoFileName("histoinfo.xml"),
 _trackCandidatesInputCollectionName("TrackCandidatesCollection"),
 _tracksOutputCollectionName("TrackCollection"),
 _trackFitter(0),
+_milleGBL(0),
 _nProcessedRuns(0),
 _nProcessedEvents(0),
 _flag_nohistos(false),
@@ -167,12 +168,45 @@ _aidaProfileMap2D()
     // Histogram information
 
     registerOptionalParameter("HistogramInfoFilename", "Name of histogram info xml file", _histoInfoFileName, string("histoinfo.xml"));
+
+
+
+    // MILLEPEDE specific parameters
+    registerOptionalParameter("AlignmentMode", "Alignment mode specifies alignment degrees of freedom to be considered\n"
+            "0 - No alignment at all. Simply fit tracks assuming that alignment is correct\n"
+            "1 - Alignment of XY shifts\n"
+            "2 - Alignment of XY shifts + rotations around Z\n"
+            "3 - Alignment of XYZ shifts + rotations around Z\n"
+            "4 - Alignment of XY shifts + rotations around X and Z\n"
+            "5 - Alignment of XY shifts + rotations around Y and Z\n"
+            "6 - Alignment of XY shifts + rotations around X,Y and Z\n"
+            "7 - Alignment of XYZ shifts + rotations around X,Y and Z\n",
+            _alignmentMode, static_cast<int> (0));
+
+    registerOptionalParameter("MilleBinaryFilename", "Name of the Millepede binary file", _milleBinaryFilename, std::string("mille.bin"));
+
+    registerOptionalParameter("MilleSteeringFilename", "Name of the Millepede steering file to be created", _milleSteeringFilename, std::string("pede-steer.txt"));
+    
+    registerOptionalParameter("MilleResultFilename", "Name of the Millepede result file", _milleResultFileName, std::string("millepede.res"));
+    
+    registerOptionalParameter("GearAlignedFile", "Suffix to add to the new Gear with alignment corrections", _gear_aligned_file, std::string("gear-00001-aligned.xml"));
+
+    registerOptionalParameter("PedeSteeringAdditionalCmds","FOR EXPERTS: List of commands that should be included in the pede steering file. Use '\\' to seperate options and introduce a line break.",_pedeSteerAddCmds, StringVec());
+
+    registerOptionalParameter("MilleMaxChi2Cut", "Maximum chi2 of a track candidate that goes into millepede", _maxChi2Cut, double(1000.));
+
+    registerOptionalParameter("AlignmentPlanes", "Ids of planes to be used in alignment", _alignmentPlaneIds, IntVec());
+ 
+ 
 }
 
 void EUTelProcessorTrackingGBLTrajectory::init() {
 
     streamlog_out(DEBUG2) << "EUTelProcessorTrackingGBLTrajectory::init( )" << std::endl;
 
+    // Free file resource before running pede exe
+    delete _milleGBL;
+ 
     // usually a good idea to
     printParameters();
 
@@ -189,17 +223,32 @@ void EUTelProcessorTrackingGBLTrajectory::init() {
     {
         streamlog_out(DEBUG) << "Initialisation of track fitter" << std::endl;
 
+        const unsigned int reserveSize = 80000;
+        _milleGBL = new gbl::MilleBinary(_milleBinaryFilename, reserveSize);
+
+        if (_milleGBL == 0) {
+
+            streamlog_out(ERROR) << "Can't allocate an instance of mMilleBinary. Stopping ..." << std::endl;
+            throw UnknownDataTypeException("MilleBinary was not created");
+        }
 
         
         // Initialize GBL fitter
         EUTelGBLFitter* Fitter = new EUTelGBLFitter("GBLFitter");
-
+        Fitter->SetAlignmentMode(_alignmentMode);
         Fitter->setParamterIdPlaneVec(_planeIds);
         Fitter->setParamterIdXResolutionVec(_SteeringxResolutions);
         Fitter->setParamterIdYResolutionVec(_SteeringyResolutions);
 
         Fitter->setExcludeFromFitPlanes( _excludePlanesFromFit );
 
+        Fitter->setParamterIdXShiftsMap(_xShiftsMap);
+        Fitter->setParamterIdYShiftsMap(_yShiftsMap);
+        Fitter->setParamterIdZShiftsMap(_zShiftsMap);
+        Fitter->setParamterIdXRotationsMap(_xRotationsMap);
+        Fitter->setParamterIdYRotationsMap(_yRotationsMap);
+        Fitter->setParamterIdZRotationsMap(_zRotationsMap);
+        Fitter->SetMilleBinary(_milleGBL);
         Fitter->SetBeamEnergy(_eBeam);
         Fitter->SetBeamCharge(_qBeam);
         Fitter->SetChi2Cut(_maxChi2Cut);
@@ -297,9 +346,15 @@ void EUTelProcessorTrackingGBLTrajectory::processEvent(LCEvent * evt) {
 
         if (  nTracks > 0 ) {
             _trackFitter->SetTrackCandidates(trackCandidates);
-            _trackFitter->TrackCandidatesToGBLTrajectories();
-            _trackFitter->PerformFitGBLTrajectories();
+           _trackFitter->TrackCandidatesToGBLTrajectories();
+  return;
+           _trackFitter->PerformFitGBLTrajectories();
 
+            if( _alignmentMode == 0 )
+            {
+             _trackFitter->PerformMille();
+            }
+return;
             IMPL::LCCollectionVec* fittrackvec = static_cast< EUTelGBLFitter* > (_trackFitter)->GetFitTrackVec();
 //            vector<IMPL::TrackImpl *> *fittrackvec = static_cast<vector<IMPL::TrackImpl *> *> (collection);
 
