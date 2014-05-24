@@ -65,12 +65,12 @@ namespace eutelescope {
     _alignmentMode(Utility::XYShiftXYRot),
     _mEstimatorType(),
     _mille(0),
-    _paramterIdXShiftsMap(),
-    _paramterIdYShiftsMap(),
-    _paramterIdZShiftsMap(),
-    _paramterIdXRotationsMap(),
-    _paramterIdYRotationsMap(),
-    _paramterIdZRotationsMap(),
+    _parameterIdXShiftsMap(),
+    _parameterIdYShiftsMap(),
+    _parameterIdZShiftsMap(),
+    _parameterIdXRotationsMap(),
+    _parameterIdYRotationsMap(),
+    _parameterIdZRotationsMap(),
     _excludeFromFit(),
     _chi2cut(1000.),
     _eomIntegrator( new EUTelUtilityRungeKutta() ),
@@ -97,12 +97,12 @@ namespace eutelescope {
     _alignmentMode(Utility::XYShiftXYRot),
     _mEstimatorType(),
     _mille(0),
-    _paramterIdXShiftsMap(),
-    _paramterIdYShiftsMap(),
-    _paramterIdZShiftsMap(),
-    _paramterIdXRotationsMap(),
-    _paramterIdYRotationsMap(),
-    _paramterIdZRotationsMap(),
+    _parameterIdXShiftsMap(),
+    _parameterIdYShiftsMap(),
+    _parameterIdZShiftsMap(),
+    _parameterIdXRotationsMap(),
+    _parameterIdYRotationsMap(),
+    _parameterIdZRotationsMap(),
     _excludeFromFit(),
     _chi2cut(1000.),
     _eomIntegrator( new EUTelUtilityRungeKutta() ),
@@ -121,66 +121,66 @@ namespace eutelescope {
     
     void EUTelGBLFitter::setParamterIdPlaneVec( const std::vector<int>& vector)
     {
-      _paramterIdPlaneVec = vector;
+      _parameterIdPlaneVec = vector;
     }
  
     void EUTelGBLFitter::setParamterIdXResolutionVec( const std::vector<float>& vector)
     {
-      _paramterIdXResolutionVec = vector;
+      _parameterIdXResolutionVec = vector;
     }
  
     void EUTelGBLFitter::setParamterIdYResolutionVec( const std::vector<float>& vector)
     {
-      _paramterIdYResolutionVec = vector;
+      _parameterIdYResolutionVec = vector;
     }
        
 
     void EUTelGBLFitter::setParamterIdXRotationsMap( const std::map<int, int>& map ) {
-        _paramterIdXRotationsMap = map;
+        _parameterIdXRotationsMap = map;
     }
     
     void EUTelGBLFitter::setParamterIdYRotationsMap( const std::map<int, int>& map ) {
-        _paramterIdYRotationsMap = map;
+        _parameterIdYRotationsMap = map;
     }
     
     void EUTelGBLFitter::setParamterIdZRotationsMap( const std::map<int, int>& map ) {
-        _paramterIdZRotationsMap = map;
+        _parameterIdZRotationsMap = map;
     }
 
     void EUTelGBLFitter::setParamterIdZShiftsMap( const std::map<int, int>& map ) {
-        _paramterIdZShiftsMap = map;
+        _parameterIdZShiftsMap = map;
     }
 
     void EUTelGBLFitter::setParamterIdYShiftsMap( const std::map<int, int>& map ) {
-        _paramterIdYShiftsMap = map;
+        _parameterIdYShiftsMap = map;
     }
 
     void EUTelGBLFitter::setParamterIdXShiftsMap( const std::map<int, int>& map ) {
-        _paramterIdXShiftsMap = map;
+        _parameterIdXShiftsMap = map;
     }
     
     const std::map<int, int>& EUTelGBLFitter::getParamterIdXRotationsMap() const {
-        return _paramterIdXRotationsMap;
+        return _parameterIdXRotationsMap;
     }
     
     const std::map<int, int>& EUTelGBLFitter::getParamterIdYRotationsMap() const {
-        return _paramterIdYRotationsMap;
+        return _parameterIdYRotationsMap;
     }
     
     const std::map<int, int>& EUTelGBLFitter::getParamterIdZRotationsMap() const {
-        return _paramterIdZRotationsMap;
+        return _parameterIdZRotationsMap;
     }
 
     const std::map<int, int>& EUTelGBLFitter::getParamterIdZShiftsMap() const {
-        return _paramterIdZShiftsMap;
+        return _parameterIdZShiftsMap;
     }
 
     const std::map<int, int>& EUTelGBLFitter::getParamterIdYShiftsMap() const {
-        return _paramterIdYShiftsMap;
+        return _parameterIdYShiftsMap;
     }
 
     const std::map<int, int>& EUTelGBLFitter::getParamterIdXShiftsMap() const {
-        return _paramterIdXShiftsMap;
+        return _parameterIdXShiftsMap;
     }
 
     void EUTelGBLFitter::setMEstimatorType( const std::string& mEstimatorType ) {
@@ -554,8 +554,8 @@ namespace eutelescope {
         alDer[0][1] =  0.0; // dx/dy
         alDer[1][0] =  0.0; // dy/dx
         alDer[1][1] = -1.0; // dy/dy
-        globalLabels[0] = _paramterIdXShiftsMap[iPlane]; // dx
-        globalLabels[1] = _paramterIdYShiftsMap[iPlane]; // dy
+        globalLabels[0] = _parameterIdXShiftsMap[iPlane]; // dx
+        globalLabels[1] = _parameterIdYShiftsMap[iPlane]; // dy
 
 
         if (_alignmentMode == Utility::XYShiftXYRot
@@ -566,7 +566,7 @@ namespace eutelescope {
                 || _alignmentMode == Utility::XYZShiftXZRotYZRotXYRot) {
             alDer[0][2] = -predpos[1]; // dx/rot
             alDer[1][2] =  predpos[0]; // dy/rot
-            globalLabels[2] = _paramterIdZRotationsMap[iPlane]; // rot z
+            globalLabels[2] = _parameterIdZRotationsMap[iPlane]; // rot z
         }
 
 
@@ -574,16 +574,16 @@ namespace eutelescope {
                 || _alignmentMode == Utility::XYZShiftXZRotYZRotXYRot) {
             alDer[0][3] =   -xSlope; // dx/dz
             alDer[1][3] =   -ySlope; // dy/dz
-            globalLabels[3] = _paramterIdZShiftsMap[iPlane]; // dz
+            globalLabels[3] = _parameterIdZShiftsMap[iPlane]; // dz
         }
 
         if (_alignmentMode == Utility::XYZShiftXZRotYZRotXYRot) {
             alDer[0][4] =   predpos[0]*xSlope; // dx/rot y
             alDer[1][4] =   predpos[0]*ySlope; // dy/rot y
-            globalLabels[4] = _paramterIdYRotationsMap[iPlane]; // drot y  - actually X?
+            globalLabels[4] = _parameterIdYRotationsMap[iPlane]; // drot y  - actually X?
             alDer[0][5] =  -predpos[1]*xSlope; // dx/rot x          
             alDer[1][5] =  -predpos[1]*ySlope; // dy/rot x         
-            globalLabels[5] = _paramterIdXRotationsMap[iPlane]; // drot x  - actually Y?
+            globalLabels[5] = _parameterIdXRotationsMap[iPlane]; // drot x  - actually Y?
         }
 
 
@@ -591,29 +591,29 @@ namespace eutelescope {
         if (_alignmentMode == Utility::XYShiftXZRotXYRot) {
             alDer[0][3] = predpos[0]*xSlope; // dx/rot y
             alDer[1][3] = predpos[0]*ySlope; // dy/rot y
-            globalLabels[3] = _paramterIdYRotationsMap[iPlane]; // drot y
+            globalLabels[3] = _parameterIdYRotationsMap[iPlane]; // drot y
         }
         if (_alignmentMode == Utility::XYShiftYZRotXYRot) {
             alDer[0][3] = predpos[1]*xSlope; // dx/rot x
             alDer[1][3] = predpos[1]*ySlope; // dy/rot x
-            globalLabels[3] = _paramterIdXRotationsMap[iPlane]; // drot x
+            globalLabels[3] = _parameterIdXRotationsMap[iPlane]; // drot x
         }
  
         if (_alignmentMode == Utility::XYShiftXZRotYZRotXYRot) {
             alDer[0][3] = predpos[0]*xSlope; // dx/rot y
             alDer[1][3] = predpos[0]*ySlope; // dy/rot y
-            globalLabels[3] = _paramterIdYRotationsMap[iPlane]; // drot y
+            globalLabels[3] = _parameterIdYRotationsMap[iPlane]; // drot y
             alDer[0][4] = predpos[1]*xSlope; // dx/rot x
             alDer[1][4] = predpos[1]*ySlope; // dy/rot x
-            globalLabels[4] = _paramterIdXRotationsMap[iPlane]; // drot x
+            globalLabels[4] = _parameterIdXRotationsMap[iPlane]; // drot x
         }
         if (_alignmentMode == Utility::XYShiftXZRotYZRotXYRot) {
             alDer[0][3] = predpos[0]*xSlope; // dx/rot y
             alDer[1][3] = predpos[0]*ySlope; // dy/rot y
-            globalLabels[3] = _paramterIdYRotationsMap[iPlane]; // drot y
+            globalLabels[3] = _parameterIdYRotationsMap[iPlane]; // drot y
             alDer[0][4] = predpos[1]*xSlope; // dx/rot x
             alDer[1][4] = predpos[1]*ySlope; // dy/rot x
-            globalLabels[4] = _paramterIdXRotationsMap[iPlane]; // drot x
+            globalLabels[4] = _parameterIdXRotationsMap[iPlane]; // drot x
         }
 
         point.addGlobals(globalLabels, alDer);
@@ -698,7 +698,7 @@ namespace eutelescope {
         const EVENT::TrackerHitVec& ihits = (*itTrkCand)->getTrackerHits();
         int itrk = (*itTrkCand)->id();
         int nhits =  ihits.size( ) ;
-        int expec = _paramterIdPlaneVec.size();
+        int expec = _parameterIdPlaneVec.size();
         streamlog_out(MESSAGE1) <<  " track itrk:" <<  itrk  << " with " << nhits << " at least " << expec << "       " ;//std::endl;
         for (int i = 0; i< ihits.size(); i++ ) 
         { 
@@ -777,7 +777,7 @@ namespace eutelescope {
         const EVENT::TrackerHitVec& chits = fittrack->getTrackerHits();
          itrk = fittrack->id();
          nhits =  chits.size( ) ;
-         expec =  _paramterIdPlaneVec.size();
+         expec =  _parameterIdPlaneVec.size();
 		streamlog_out(MESSAGE1) <<  " track itrk:" <<  itrk  << " with " << nhits << " at least " << expec  << "       ";//std::endl;
         for (int i = 0; i< chits.size(); i++ ) 
         { 
@@ -1061,6 +1061,12 @@ namespace eutelescope {
 
     }
 
+    void EUTelGBLFitter::PerformMille() {
+
+
+    }
+
+
 // GBL Trajectory treatment ::  Fit and dump into LCIO
     void EUTelGBLFitter::PerformFitGBLTrajectory( gbl::GblTrajectory* traj, vector<IMPL::TrackImpl*>::const_iterator& itTrkCand, double invP  ) {
                 
@@ -1083,7 +1089,7 @@ namespace eutelescope {
                 if ( !_mEstimatorType.empty( ) ) ierr = traj->fit( chi2, ndf, loss, _mEstimatorType );
                 else ierr = traj->fit( chi2, ndf, loss );
 
-                std::cout << "ierr : "<< ierr << " and chi2: " << chi2 << std::endl;
+                streamlog_out(MESSAGE0) << "ierr : "<< ierr << " and chi2: " << chi2 << std::endl;
 
                 if (  1==1 || chi2 < _chi2cut ) 
                 {
@@ -1147,17 +1153,17 @@ namespace eutelescope {
             int imatch=0;
             for ( itHit = hits.rbegin(); itHit != hits.rend(); ++itHit) {
               const int planeID = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >(*itHit) );
-              for(int izPlane=0;izPlane<_paramterIdPlaneVec.size();izPlane++) {
-                if( _paramterIdPlaneVec[izPlane] == planeID )
+              for(int izPlane=0;izPlane<_parameterIdPlaneVec.size();izPlane++) {
+                if( _parameterIdPlaneVec[izPlane] == planeID )
                 {  
                   imatch++;
                   break;
                 }
               }            
             }
-            streamlog_out( MESSAGE1 ) << "from the list of requested planes and available hit on a track candidate: " << imatch << "/" <<_paramterIdPlaneVec.size() << " found" << std::endl;
+            streamlog_out( MESSAGE1 ) << "from the list of requested planes and available hit on a track candidate: " << imatch << "/" <<_parameterIdPlaneVec.size() << " found" << std::endl;
 
-            if( imatch != _paramterIdPlaneVec.size() ) 
+            if( imatch != _parameterIdPlaneVec.size() ) 
             { 
               streamlog_out(MESSAGE1) << " Number of hits does not correspond to the number of planes selected for tracking" << std::endl;
               return;
@@ -1223,14 +1229,14 @@ namespace eutelescope {
                     hitcov[3]=0.00;
 
                     // check Processor Parameters for plane resolution // Denys
-                    if( _paramterIdXResolutionVec.size() > 0 && _paramterIdYResolutionVec.size() > 0 )
+                    if( _parameterIdXResolutionVec.size() > 0 && _parameterIdYResolutionVec.size() > 0 )
                     {
-                      for(int izPlane=0;izPlane<_paramterIdPlaneVec.size();izPlane++)
+                      for(int izPlane=0;izPlane<_parameterIdPlaneVec.size();izPlane++)
                       {
-                        if( _paramterIdPlaneVec[izPlane] == planeID )
+                        if( _parameterIdPlaneVec[izPlane] == planeID )
                         {  
-                          hitcov[0] =  _paramterIdXResolutionVec[izPlane];
-                          hitcov[2] =  _paramterIdYResolutionVec[izPlane];
+                          hitcov[0] =  _parameterIdXResolutionVec[izPlane];
+                          hitcov[2] =  _parameterIdYResolutionVec[izPlane];
                           hitcov[0] *= hitcov[0]; // squared !
                           hitcov[2] *= hitcov[2]; // squared !
                           break;
@@ -1468,9 +1474,9 @@ namespace eutelescope {
                 }
               }            
             }
-            streamlog_out( MESSAGE1 ) << "from the list of requested planes and available hit on a track candidate: " << imatch << "/" <<_paramterIdPlaneVec.size() << " found" << std::endl;
+            streamlog_out( MESSAGE1 ) << "from the list of requested planes and available hit on a track candidate: " << imatch << "/" <<_parameterIdPlaneVec.size() << " found" << std::endl;
 
-            if( imatch != _paramterIdPlaneVec.size() ) 
+            if( imatch != _parameterIdPlaneVec.size() ) 
             { 
               streamlog_out(MESSAGE1) << " Number of hits does not correspond to the number of planes selected for tracking" << std::endl;
 //              delete ( *itTrkCand );
@@ -1498,14 +1504,14 @@ namespace eutelescope {
                 hitcov[3]=0.00;
 
                 // check Processor Parameters for plane resolution // Denys
-                if( _paramterIdXResolutionVec.size() > 0 && _paramterIdYResolutionVec.size() > 0 )
+                if( _parameterIdXResolutionVec.size() > 0 && _parameterIdYResolutionVec.size() > 0 )
                 {
-                  for(int izPlane=0;izPlane<_paramterIdPlaneVec.size();izPlane++)
+                  for(int izPlane=0;izPlane<_parameterIdPlaneVec.size();izPlane++)
                   {
-                    if( _paramterIdPlaneVec[izPlane] == planeID )
+                    if( _parameterIdPlaneVec[izPlane] == planeID )
                     {  
-                      hitcov[0] =  _paramterIdXResolutionVec[izPlane];
-                      hitcov[2] =  _paramterIdYResolutionVec[izPlane];
+                      hitcov[0] =  _parameterIdXResolutionVec[izPlane];
+                      hitcov[2] =  _parameterIdYResolutionVec[izPlane];
  
                       hitcov[0] *= hitcov[0]; // squared !
                       hitcov[2] *= hitcov[2]; // squared !
@@ -1852,14 +1858,14 @@ namespace eutelescope {
                 hitcov[3]=0.00;
 
             // check Processor Parameters for plane resolution // Denys
-                if( _paramterIdXResolutionVec.size() > 0 && _paramterIdYResolutionVec.size() > 0 )
+                if( _parameterIdXResolutionVec.size() > 0 && _parameterIdYResolutionVec.size() > 0 )
                 {
-                  for(int izPlane=0;izPlane<_paramterIdPlaneVec.size();izPlane++)
+                  for(int izPlane=0;izPlane<_parameterIdPlaneVec.size();izPlane++)
                   {
-                    if( _paramterIdPlaneVec[izPlane] == planeID )
+                    if( _parameterIdPlaneVec[izPlane] == planeID )
                     {  
-                      hitcov[0] =  _paramterIdXResolutionVec[izPlane];
-                      hitcov[2] =  _paramterIdYResolutionVec[izPlane];
+                      hitcov[0] =  _parameterIdXResolutionVec[izPlane];
+                      hitcov[2] =  _parameterIdYResolutionVec[izPlane];
  
                       hitcov[0] *= hitcov[0]; // squared !
                       hitcov[2] *= hitcov[2]; // squared !

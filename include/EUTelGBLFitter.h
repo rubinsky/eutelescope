@@ -70,6 +70,7 @@ namespace eutelescope {
         // private:
         void TrackCandidatesToGBLTrajectory( vector<IMPL::TrackImpl*>::const_iterator&  );
         void PerformFitGBLTrajectory( gbl::GblTrajectory* ,  vector<IMPL::TrackImpl*>::const_iterator&, double );
+        void PerformMille();
 
         void FitSingleTrackCandidate(EVENT::TrackVec::const_iterator& itTrkCand);
  
@@ -243,31 +244,31 @@ namespace eutelescope {
         gbl::MilleBinary* _mille;
         
         /** Parameter resolutions */
-        std::vector<int> _paramterIdPlaneVec;
+        std::vector<int> _parameterIdPlaneVec;
  
         /** Parameter resolutions */
-        std::vector< float> _paramterIdXResolutionVec;
+        std::vector< float> _parameterIdXResolutionVec;
  
         /** Parameter resolutions */
-        std::vector< float> _paramterIdYResolutionVec;
+        std::vector< float> _parameterIdYResolutionVec;
 
         /** Parameter ids */
-        std::map<int,int> _paramterIdXShiftsMap;
+        std::map<int,int> _parameterIdXShiftsMap;
         
         /** Parameter ids */
-        std::map<int,int> _paramterIdYShiftsMap;
+        std::map<int,int> _parameterIdYShiftsMap;
         
         /** Parameter ids */
-        std::map<int,int> _paramterIdZShiftsMap;
+        std::map<int,int> _parameterIdZShiftsMap;
         
         /** Parameter ids */
-        std::map<int,int> _paramterIdXRotationsMap;
+        std::map<int,int> _parameterIdXRotationsMap;
         
         /** Parameter ids */
-        std::map<int,int> _paramterIdYRotationsMap;
+        std::map<int,int> _parameterIdYRotationsMap;
         
         /** Parameter ids */
-        std::map<int,int> _paramterIdZRotationsMap;
+        std::map<int,int> _parameterIdZRotationsMap;
         
         /** Planes ids to be excluded from refit */
         std::vector< int > _excludeFromFit;
