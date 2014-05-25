@@ -350,7 +350,7 @@ void EUTelProcessorTrackingGBLTrajectory::processEvent(LCEvent * evt) {
   return;
            _trackFitter->PerformFitGBLTrajectories();
 
-            if( _alignmentMode == 0 )
+            if( _alignmentMode > 0 )
             {
              _trackFitter->PerformMille();
             }

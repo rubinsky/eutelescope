@@ -65,12 +65,12 @@ namespace eutelescope {
         void FitTracks();
 
         void TrackCandidatesToGBLTrajectories();
-        void PerformFitGBLTrajectories();
+//        void PerformFitGBLTrajectories();
 
         // private:
         void TrackCandidatesToGBLTrajectory( vector<IMPL::TrackImpl*>::const_iterator&  );
         void PerformFitGBLTrajectory( gbl::GblTrajectory* ,  vector<IMPL::TrackImpl*>::const_iterator&, double );
-        void PerformMille();
+//        void PerformMille();
 
         void FitSingleTrackCandidate(EVENT::TrackVec::const_iterator& itTrkCand);
  
@@ -197,13 +197,15 @@ namespace eutelescope {
         IMPL::TrackImpl* prepareLCIOTrack( gbl::GblTrajectory*, const vector<IMPL::TrackImpl*>::const_iterator&,
                                 double, int, double, double, double, double, double );
       
-        void prepareLCIOTrack( gbl::GblTrajectory*, const EVENT::TrackerHitVec&,
-                                double, int, double, double, double, double, double );
 
-//         void prepareMilleOut( gbl::GblTrajectory*, const EVENT::TrackerHitVec&,
-        void prepareMilleOut( gbl::GblTrajectory*, const EVENT::TrackVec::const_iterator&,
+        void prepareMilleOut( gbl::GblTrajectory*, const vector<IMPL::TrackImpl*>::const_iterator& );
+
+// to be obsolete:
+            void prepareLCIOTrack( gbl::GblTrajectory*, const EVENT::TrackerHitVec&,
                                 double, int, double, double, double, double, double );
- 
+            void prepareMilleOut( gbl::GblTrajectory*, const EVENT::TrackVec::const_iterator& );
+//
+
     private:
         vector<IMPL::TrackImpl*> _trackCandidatesVec;
 

@@ -1055,15 +1055,22 @@ namespace eutelescope {
 		proL2m[1][1] = rotation[4]; // y projection, yy
 
     }
-
+/*
     void EUTelGBLFitter::PerformFitGBLTrajectories() {
+               streamlog_out ( MESSAGE1 ) << " EUTelGBLFitter::PerformMille start " << endl;
 
-
+               streamlog_out ( MESSAGE1 ) << " EUTelGBLFitter::PerformMille end " << endl;
     }
 
     void EUTelGBLFitter::PerformMille() {
+               streamlog_out ( MESSAGE1 ) << " EUTelGBLFitter::PerformMille start " << endl;
 
+        for (it = _gblTrackCandidates.begin(); it != _gblTrackCandidates.end(); ++it) 
+        {           
+              prepareMilleOut( it->second );           
+        }
 
+        streamlog_out ( MESSAGE1 ) << " EUTelGBLFitter::PerformMille end " << endl;
     }
 
 
@@ -1091,9 +1098,7 @@ namespace eutelescope {
 
                 streamlog_out(MESSAGE0) << "ierr : "<< ierr << " and chi2: " << chi2 << std::endl;
 
-                if (  1==1 || chi2 < _chi2cut ) 
-                {
-                    if ( 1==1 || ierr  )
+                if ( ierr  )
                     {
 		        if ( streamlog_level(MESSAGE0) ){
 	        	  std::cout << "after fit FitTrack - trajectory: " << std::endl;
@@ -1111,7 +1116,12 @@ namespace eutelescope {
                     // Write fit result
                     prepareLCIOTrack( traj, itTrkCand, chi2, ndf, invP, 0., 0., 0., 0. );
 
-                } 
+                    // Prepare and write Mille Out only when enabled (and chi2 is below _chi2cut)
+                    if (_alignmentMode != Utility::noAlignment) 
+                    {
+                       prepareMilleOut( traj, itTrkCand) ;//, chi2, ndf, invP, 0., 0., 0., 0. );
+                    }
+ 
                 
     }
 
@@ -1697,7 +1707,7 @@ namespace eutelescope {
                     // Prepare and write Mille Out only when enabled (and chi2 is below _chi2cut)
                     if (_alignmentMode != Utility::noAlignment) 
                     {
-                       prepareMilleOut( traj, itTrkCand, chi2, ndf, invP, 0., 0., 0., 0. );
+                       prepareMilleOut( traj, itTrkCand) ;//, chi2, ndf, invP, 0., 0., 0., 0. );
                     }
                 } 
                 
@@ -1707,13 +1717,136 @@ namespace eutelescope {
         return;
     } // EUTelGBLFitter::FitTracks()
 
+    void EUTelGBLFitter::prepareMilleOut( gbl::GblTrajectory* gblTraj, const vector<IMPL::TrackImpl*>::const_iterator& itTrkCand) {
 
-    void EUTelGBLFitter::prepareMilleOut( gbl::GblTrajectory* gblTraj, const EVENT::TrackVec::const_iterator& itTrkCand, 
-                                          double chi2, int ndf, double omega, double d0, double z0, double phi, double tanlam ) {
+
+
+        IMPL::TrackImpl * fittrack =  *itTrkCand;
+
+        unsigned int numData;
+        TVectorD corrections(5);
+        TMatrixDSym correctionsCov(5);
+ 
+        TVectorD residual(2);
+        TVectorD measErr(2);
+        TVectorD residualErr(2);
+        TVectorD downWeight(2);
+        
+          streamlog_out(MESSAGE1) << endl; 
+ 
+          int nstates = fittrack->getTrackStates().size();
+          streamlog_out(MESSAGE1) << "states " << nstates << "    " << endl;
+
+// now get starting point:  // needed by GBL point
+          TMatrixD jacPointToPoint(5, 5);
+          jacPointToPoint.UnitMatrix();
+
+          // Z axis points along beam direction.
+          double pt = ( 1./(*itTrkCand)->getOmega() ) * _beamQ;
+          double px = (*itTrkCand)->getTanLambda() * pt;
+	  double py = pt * sin( (*itTrkCand)->getPhi() );
+	  double pz = pt * cos( (*itTrkCand)->getPhi() );
+
+	  double tx   = px / pz;
+	  double ty   = py / pz;
+	  double invP = _beamQ / sqrt( px*px + pt*pt );
+ 
+          std::vector< gbl::GblPoint > pointList;
+
+
+        TMatrixD alDer; // alignment derivatives
+        std::vector<int> globalLabels;
+        if (_alignmentMode == Utility::XYShift) {
+            globalLabels.resize(2);
+            alDer.ResizeTo(2, 2);
+        } else if (_alignmentMode == Utility::XYShiftXYRot) {
+            globalLabels.resize(3);
+            alDer.ResizeTo(2, 3);
+        } else if (_alignmentMode == Utility::XYZShiftXYRot) {
+            globalLabels.resize(4);
+            alDer.ResizeTo(2, 4);
+        } else if (_alignmentMode == Utility::XYShiftYZRotXYRot) {
+            globalLabels.resize(4);
+            alDer.ResizeTo(2, 4);
+        } else if (_alignmentMode == Utility::XYShiftXZRotXYRot) {
+            globalLabels.resize(4);
+            alDer.ResizeTo(2, 4);
+        } else if (_alignmentMode == Utility::XYShiftXZRotYZRotXYRot) {
+            globalLabels.resize(5);
+            alDer.ResizeTo(2, 5);
+        } else if (_alignmentMode == Utility::XYZShiftXZRotYZRotXYRot) {
+            globalLabels.resize(6);
+            alDer.ResizeTo(2, 6);
+        }
+        alDer.Zero();
+ 
+ 
+          for(int i=0;i < nstates; i++) 
+            {
+                const IMPL::TrackStateImpl* const_trkState = static_cast <const IMPL::TrackStateImpl*> ( (*itTrkCand)->getTrackStates().at(i) ) ;
+
+                double fitPointLocal[] = {0.,0.,0.};
+                fitPointLocal[0] = const_trkState->getReferencePoint()[0] ;
+                fitPointLocal[1] = const_trkState->getReferencePoint()[1] ;
+                fitPointLocal[2] = const_trkState->getReferencePoint()[2] ;
+
+                double bd0        = const_trkState->getD0() ;
+ 	        double bphi       = const_trkState->getPhi() ;
+                double bomega     = const_trkState->getOmega() ;
+	        double btanlambda = const_trkState->getTanLambda() ;
+	        double bz0        = const_trkState->getZ0() ;
+
+                const int hitGblLabel = _hitId2GblPointLabel[ const_trkState->id() ];
+
+                streamlog_out(MESSAGE1) << hitGblLabel << " corr: " << const_trkState->id() 
+                                        << " [d0]" << std::setw(6) << bd0 << ":" 
+                                        << " [phi]" << std::setw(6) << bphi << ":" 
+                                        << " [ome]" << std::setw(6) << bomega << ":" 
+                                        << " [tanl]" << std::setw(6) << btanlambda << ":" 
+                                        << " [z0]" << std::setw(6) << bz0 << ":" << " ["<< setw(3) << const_trkState->getLocation() <<"]" 
+                                        << " points:"  << setw(8) << fitPointLocal[0] << setw(8) << fitPointLocal[1] << setw(8) << fitPointLocal[2] << " "  ;   
+
+               streamlog_out(MESSAGE1) << endl; 
+            }
+ 
+        streamlog_out(MESSAGE1) << endl; 
+
+ 
+	//Create instance of Decoder for use later to determine Plane ID
+	UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
+
+        TVectorD scat(2);
+        scat.Zero();
+        TVectorD scatPrecSensor(2);
+
+        double p = _eBeam; // beam momentum 
+ 
+        if( abs(_eBeam)<1e-12) streamlog_out(WARNING) << " provided beam energy is too low, _eBeam = " << _eBeam << " check inputs!" << std::endl;
+
+
+        gbl::GblTrajectory* traj;
+        traj = new gbl::GblTrajectory( pointList, false );
+ 
+        if ( streamlog_level(MESSAGE0) ){
+          std::cout << "MilleOut - trajectory: " << std::endl;
+ 	  traj->printTrajectory(1);
+	  traj->printData();
+ 	  traj->printPoints(1);
+        }
+
+        traj->milleOut( *_mille );
+        
+        delete traj; 
+
+    }
+
+    void EUTelGBLFitter::prepareMilleOut( gbl::GblTrajectory* gblTraj, const EVENT::TrackVec::const_iterator& itTrkCand ) {
+//                                          double chi2, int ndf, double omega, double d0, double z0, double phi, double tanlam ) {
 
         const EVENT::TrackerHitVec trackCandidate = (*itTrkCand)->getTrackerHits();
-				//Create instance of Decoder for use later to determine Plane ID
-				UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
+	
+	//Create instance of Decoder for use later to determine Plane ID
+	UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
 
 // now get starting point:
           TMatrixD jacPointToPoint(5, 5);
