@@ -13,9 +13,7 @@
 // eutelescope includes ".h"
 #include "EUTELESCOPE.h"
 #include "EUTelVirtualCluster.h"
-#include "EUTelAPIXSparsePixel.h"
 #include "EUTelSparseDataImpl.h"
-#include "EUTelAPIXSparseClusterImpl.h"
 
 // lcio includes <.h>
 #include "IMPL/TrackerHitImpl.h"
@@ -194,7 +192,7 @@ namespace eutelescope {
 
         EUTelVirtualCluster* GetClusterFromHit(const IMPL::TrackerHitImpl*);
 
-        int GuessSensorID(const EVENT::TrackerHit* hit);
+        int GuessSensorID( EVENT::TrackerHit* hit);
 
         /** Highland's formula for multiple scattering */
         double getThetaRMSHighland( double, double );

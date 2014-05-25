@@ -95,7 +95,6 @@ Fys="0     20     5"
 Fzr="0     20      "
 Fzs="0 1 2 20 3 4 5"
 
-
 ResidualsRMax="0.5" 
 
 echo "starting XY shifts/rotations"
@@ -165,7 +164,6 @@ r="0.050";
 
 #pede="chiscut 500. 50. "
 Chi2Cut="30."
-
 
 for x in {11..20}; do
 

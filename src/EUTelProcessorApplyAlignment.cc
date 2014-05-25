@@ -139,21 +139,25 @@ void EUTelProcessorApplyAlign::processEvent (LCEvent * event) {
       _isFirstEvent = false;
     }
 
-    LCCollectionVec * outputCollectionVec = new LCCollectionVec(LCIO::TRACKERHIT);
+    LCCollectionVec* outputCollectionVec = new LCCollectionVec(LCIO::TRACKERHIT);
+    UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder( EUTELESCOPE::HITENCODING );      
 
     for (size_t iHit = 0; iHit < inputCollectionVec->size(); iHit++) {
       TrackerHitImpl   * inputHit   = dynamic_cast< TrackerHitImpl * >  ( inputCollectionVec->getElementAt( iHit ) ) ;
       // now we have to understand which layer this hit belongs to.
-      int sensorID = Utility::GuessSensorID(inputHit);
+
+			UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
+			const int sensorID = hitDecoder(inputHit)["sensorID"];
 
       // copy the input to the output, at least for the common part
       TrackerHitImpl   * outputHit  = new TrackerHitImpl;
       outputHit->setType( inputHit->getType() );
       outputHit->rawHits() = inputHit->getRawHits();
-      FloatVec cov;
-      cov = inputHit->getCovMatrix();
+      FloatVec cov = inputHit->getCovMatrix();
       outputHit->setCovMatrix( cov );
-
+      outputHit->setCellID0( inputHit->getCellID0() );
+      outputHit->setCellID1( inputHit->getCellID1() );
+      
       // now that we know at which sensor the hit belongs to, we can
       // get the corresponding alignment constants
       map< int , int >::iterator  positionIter = _lookUpTable.find( sensorID );

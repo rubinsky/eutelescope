@@ -16,7 +16,6 @@
 #include "EUTelDFFClusterImpl.h"
 #include "EUTelBrickedClusterImpl.h"
 #include "EUTelSparseClusterImpl.h"
-#include "EUTelSparseCluster2Impl.h"
 #include "EUTelRunHeaderImpl.h"
 #include "EUTelEventImpl.h"
 #include "EUTelClusterFilter.h"
@@ -923,16 +922,16 @@ void EUTelClusterFilter::processEvent (LCEvent * event) {
                 CellIDDecoder<TrackerDataImpl > anotherDecoder(sparseClusterCollectionVec);
                 pixelType = static_cast<SparsePixelType> ( static_cast<int> ( anotherDecoder( oneCluster )["sparsePixelType"] ));
 
-                if ( pixelType == kEUTelSimpleSparsePixel )
+                if ( pixelType == kEUTelGenericSparsePixel )
                 {
-                    cluster = new EUTelSparseClusterImpl<EUTelSimpleSparsePixel > ( static_cast<TrackerDataImpl* > (pulse->getTrackerData() ));
+                    cluster = new EUTelSparseClusterImpl<EUTelGenericSparsePixel > ( static_cast<TrackerDataImpl* > (pulse->getTrackerData() ));
 
-                    EUTelSparseClusterImpl<EUTelSimpleSparsePixel > * recasted =
-                    dynamic_cast<EUTelSparseClusterImpl<EUTelSimpleSparsePixel > *> ( cluster );
+                    EUTelSparseClusterImpl<EUTelGenericSparsePixel > * recasted =
+                    dynamic_cast<EUTelSparseClusterImpl<EUTelGenericSparsePixel > *> ( cluster );
 
                     if ( _noiseRelatedCuts )
                     {
-                        // the EUTelSparseClusterImpl<EUTelSimpleSparsePixel>
+                        // the EUTelSparseClusterImpl<EUTelGenericSparsePixel>
                         // doesn't contain any intrinsic noise information. So we
                         // need to get them from the input noise collection.
                         try
@@ -945,7 +944,7 @@ void EUTelClusterFilter::processEvent (LCEvent * event) {
                             TrackerDataImpl    * noiseMatrix = dynamic_cast<TrackerDataImpl *> ( noiseCollectionVec->getElementAt( detectorPos ));
                             EUTelMatrixDecoder   noiseMatrixDecoder( noiseDecoder, noiseMatrix ) ;
 
-                            auto_ptr<EUTelSimpleSparsePixel>  sparsePixel(new EUTelSimpleSparsePixel);
+                            auto_ptr<EUTelGenericSparsePixel>  sparsePixel(new EUTelGenericSparsePixel);
                             vector<float > noiseValues;
                             for ( unsigned int iPixel = 0 ; iPixel < recasted->size() ; iPixel++ )
                             {
@@ -968,12 +967,7 @@ void EUTelClusterFilter::processEvent (LCEvent * event) {
                   streamlog_out ( ERROR4 ) << "Unknown pixel type. Sorry for quitting" << endl;
                   throw UnknownDataTypeException("Pixel type unknown");
                 }
-
- 
-            } else if ( type == kEUTelAPIXClusterImpl ) {
-                cluster = new EUTelSparseClusterImpl< EUTelAPIXSparsePixel >
-                ( static_cast<TrackerDataImpl *> ( pulse->getTrackerData()  ) );
-            }
+		}
             else
             {
                 streamlog_out ( ERROR4 ) << "Unknown cluster type. Sorry for quitting" << endl;

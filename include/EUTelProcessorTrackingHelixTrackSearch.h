@@ -26,10 +26,6 @@
 #include "EUTelUtility.h"
 #include "EUTelTrackImpl.h"
 
-using namespace lcio;
-using namespace marlin;
-using namespace std;
-
 class EUTelTrackImpl;
 
 namespace eutelescope {
@@ -43,13 +39,13 @@ namespace eutelescope {
      * 
      *  @see EUTelTrackFinder
      */
-    class EUTelProcessorTrackingHelixTrackSearch : public Processor {
+  class EUTelProcessorTrackingHelixTrackSearch : public marlin::Processor {
     private:
         DISALLOW_COPY_AND_ASSIGN(EUTelProcessorTrackingHelixTrackSearch)   // prevent users from making (default) copies of processors
         
     public:
 
-        virtual Processor* newProcessor() {
+    virtual marlin::Processor* newProcessor() {
             return new EUTelProcessorTrackingHelixTrackSearch;
         }
 
@@ -62,13 +58,13 @@ namespace eutelescope {
 
         /** Called for every run.
          */
-        virtual void processRunHeader(LCRunHeader* run);
+        virtual void processRunHeader(lcio::LCRunHeader* run);
 
         /** Called for every event - the working horse.
          */
-        virtual void processEvent(LCEvent * evt);
+        virtual void processEvent(lcio::LCEvent * evt);
 
-        virtual void check(LCEvent * evt);
+        virtual void check(lcio::LCEvent * evt);
 
         /** Called after data processing for clean up.
          */
@@ -99,7 +95,8 @@ namespace eutelescope {
         /** Prepare LCIO data structure for dumping track
          * candidate hits into LCIO files
          */
-        void addTrackCandidateToCollection(LCEvent*, const std::vector< EVENT::TrackerHitVec >&);
+        void addTrackCandidateToCollection(lcio::LCEvent*, const std::vector< EVENT::TrackerHitVec >&);
+
 
         /** Prepare LCIO data structure for dumping track hits from PR search
          *  into LCIO files
@@ -110,20 +107,24 @@ namespace eutelescope {
         /** Prepare LCIO data structure for dumping track
          * candidate hits into LCIO files
          */
-        void addTrackCandidateToCollection1(LCEvent* evt, std::vector< IMPL::TrackImpl* >&);
+        void addTrackCandidateToCollection1(lcio::LCEvent* evt, std::vector< IMPL::TrackImpl* >&);
 
     protected:
 
         // Input/Output collections of the processor
 
+        /** Input ZS Data collection name */
+	std::string _zsDataCollectionName;
+
         /** Input TrackerHit collection name */
-        string _hitInputCollectionName;
+	std::string _hitInputCollectionName;
 
         /** Output TrackerHit collection name */
         string _hitFittedOutputCollectionName;
 
         /** Output TrackerHit collection name */
         string _trackCandidateHitsOutputCollectionName;
+
 
 
     protected:
@@ -144,7 +145,7 @@ namespace eutelescope {
     private:
 
         /** TGeo geometry file name */
-        string _tgeoFileName;
+	std::string _tgeoFileName;
         
         // Exhaustive finder state definition
 
@@ -173,7 +174,7 @@ namespace eutelescope {
         EVENT::FloatVec _beamSpread;
 
         /** Histogram info file name */
-        string _histoInfoFileName;
+	std::string _histoInfoFileName;
 
     protected:
 
@@ -194,13 +195,14 @@ namespace eutelescope {
          *  The histogram filling can proceed recalling an object through
          *  its name
          */
-        map< string, AIDA::IHistogram1D* > _aidaHistoMap1D;
+	std::map< std::string, AIDA::IHistogram1D* > _aidaHistoMap1D;
 
         /** Names of histograms */
         struct _histName {
             static string _numberTracksCandidatesHistName;
             static string _numberOfHitOnTrackCandidateHistName;
             static string _HitOnTrackCandidateHistName;
+
         };
 
 #endif // defined(USE_AIDA) || defined(MARLIN_USE_AIDA)

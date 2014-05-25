@@ -72,6 +72,9 @@ namespace eutelescope {
          */
         virtual void end();
 
+        /** Generate MILLEPEDE parameter labels */
+        void fillMilleParametersLabels();
+ 
     public:
         /** Histogram booking */
         void bookHistograms();
@@ -116,7 +119,6 @@ namespace eutelescope {
         /** Parameter ids */
         map<int,int> _zRotationsMap;
         
-        
         /** Mille binary filename */
         string _milleBinaryFilename;
 
@@ -145,11 +147,9 @@ namespace eutelescope {
         /** y Resolution of planes in AlignmentPlaneIds */
         FloatVec _SteeringyResolutions;
 
-       
         /** Planes ids to be excluded from refit */
         IntVec _excludePlanesFromFit;
         
-       
         /** Maximum value of track chi2 for millipede */
         double _maxChi2Cut;
 
@@ -159,8 +159,6 @@ namespace eutelescope {
         /** Alignment constants file name */
         string _alignmentConstantLCIOFile;
         
-
-
         /** TGeo geometry file name */
         string _tgeoFileName;
         
@@ -181,6 +179,9 @@ namespace eutelescope {
 
         /** Track fitter */
         EUTelTrackFitter *_trackFitter;
+
+        /** Mille */
+        gbl::MilleBinary * _milleGBL;
 
 
     protected:

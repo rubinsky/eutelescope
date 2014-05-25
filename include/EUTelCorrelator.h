@@ -200,10 +200,12 @@ namespace eutelescope {
      */
     EVENT::StringVec  _clusterCollectionVec;
 
-
     std::vector<double> guessSensorOffset(int internalSensorID, int externalSensorID, std::vector<double> cluCenter );
 
   private:
+
+	 void  FillHotPixelMap(LCEvent *event);
+	 bool  hitContainsHotPixels( TrackerHitImpl   * hit);
 
     //! Initialization flag
     bool _isInitialize;
@@ -351,7 +353,7 @@ namespace eutelescope {
 #if defined(USE_AIDA) || defined(MARLIN_USE_AIDA)
 
     /** Histogram info file name */
-    string _histoInfoFileName;
+    std::string _histoInfoFileName;
 
 
     //! AIDA histogram map

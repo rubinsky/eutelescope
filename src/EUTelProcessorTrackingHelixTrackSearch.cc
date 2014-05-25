@@ -33,7 +33,6 @@
 #include "EUTelMagneticFieldFinder.h"
 #include "EUTelGeometryTelescopeGeoDescription.h"
 // Cluster types
-#include "EUTelSparseCluster2Impl.h"
 #include "EUTelSparseClusterImpl.h"
 #include "EUTelBrickedClusterImpl.h"
 #include "EUTelDFFClusterImpl.h"
@@ -41,6 +40,7 @@
 
 
 using namespace lcio;
+using namespace std;
 using namespace marlin;
 using namespace eutelescope;
 
@@ -87,6 +87,11 @@ _aidaHistoMap1D() {
 
     // Processor description
     _description = "EUTelProcessorTrackingHelixTrackSearch preforms track pattern recognition.";
+
+    registerInputCollection (LCIO::TRACKERDATA, "ZSDataCollectionName", 
+                          "LCIO converted data files", 
+                          _zsDataCollectionName, string("original_zsdata"));
+
 
     // TrackerHit input collection
     registerInputCollection(LCIO::TRACKERHIT,
@@ -369,7 +374,7 @@ void EUTelProcessorTrackingHelixTrackSearch::FillHits(LCEvent * evt,
             // ok the cluster is of sparse type, but we also need to know
             // the kind of pixel description used. This information is
             // stored in the corresponding original data collection.
-            LCCollectionVec * sparseClusterCollectionVec = dynamic_cast<LCCollectionVec *> (evt->getCollection("original_zsdata"));
+            LCCollectionVec * sparseClusterCollectionVec = dynamic_cast<LCCollectionVec *> (evt->getCollection( _zsDataCollectionName ));
 
             TrackerDataImpl * oneCluster = dynamic_cast<TrackerDataImpl*> (sparseClusterCollectionVec->getElementAt(0));
             CellIDDecoder<TrackerDataImpl > anotherDecoder(sparseClusterCollectionVec);
@@ -377,11 +382,10 @@ void EUTelProcessorTrackingHelixTrackSearch::FillHits(LCEvent * evt,
 
             // now we know the pixel type. So we can properly create a new
             // instance of the sparse cluster
-            if (pixelType == kEUTelSimpleSparsePixel) {
-                cluster = new EUTelSparseClusterImpl< EUTelSimpleSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
-            } else if (pixelType == kEUTelAPIXSparsePixel) {
-                cluster = new EUTelSparseClusterImpl<EUTelAPIXSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
-            } else {
+            if (pixelType == kEUTelGenericSparsePixel) {
+                cluster = new EUTelSparseClusterImpl< EUTelGenericSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
+            }
+	    else {
                 streamlog_out(ERROR4) << "Unknown pixel type.  Sorry for quitting." << std::endl;
                 throw UnknownDataTypeException("Pixel type unknown");
             }

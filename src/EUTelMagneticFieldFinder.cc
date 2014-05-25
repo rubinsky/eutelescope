@@ -503,7 +503,7 @@ itTrk++;
             }
 
             int newSensorID = -999;
-      
+
             // iterate until the particle flies out of the detector volume
             // replaceing with loop over sensor IDs ::            while ( dz > 0 ) {
             EVENT::IntVec sensID = geo::gGeometry().sensorIDsVec();
@@ -718,7 +718,9 @@ itTrk++;
 //            // Use beam direction as a seed track state
             const double* uvpos = (*itHit)->getPosition();
             float posLocal[] =  { static_cast<float>(uvpos[0]), static_cast<float>(uvpos[1]), static_cast<float>(uvpos[2]) };
+
             const int sensorID = Utility::GuessSensorID( *itHit );
+
             double temp[] = {0.,0.,0.};
             geo::gGeometry().local2Master( sensorID, uvpos, temp);
             float posGlobal[] = { static_cast<float>(temp[0]), static_cast<float>(temp[1]), static_cast<float>(temp[2]) };
@@ -1047,14 +1049,10 @@ itTrk++;
 	  const float newPos[] = {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z0+dz)};
 	  ts->setLocation( EUTelTrackStateImpl::AtOther );
 	  ts->setReferencePoint( newPos );
-          
-	  streamlog_out( DEBUG0 ) << "New track ref point (x,y,z):" << std::endl;
-	  streamlog_out( DEBUG0 ) << std::setw(15) << ts->getReferencePoint()[0]
-				  << std::setw(15) << ts->getReferencePoint()[1]
-				  << std::setw(15) << ts->getReferencePoint()[2] << std::endl;
-                                  
-          streamlog_out(DEBUG2) << "-------------------EUTelKalmanFilter::propagateTrackRefPoint()-------------------" << std::endl;
+        
+          streamlog_out(DEBUG2) << "EUTelKalmanFilter::propagateTrackRefPoint() finish" << std::endl;
     }
+
     
     /** Find the hit closest to the intersection of a track with given sensor
      * 
@@ -1095,7 +1093,7 @@ itTrk++;
 	return *itClosestHit;
     }
     
-  double EUTelKalmanFilter::getXYPredictionPrecision( const EUTelTrackStateImpl* ts ) const {
+    double EUTelKalmanFilter::getXYPredictionPrecision( const EUTelTrackStateImpl* ts ) const {
       streamlog_out(DEBUG2) << "EUTelKalmanFilter::getXYPredictionPrecision()" << std::endl;
       
       TMatrixDSym Ckkm1 = getTrackStateCov(ts);
@@ -1813,7 +1811,8 @@ itTrk++;
         int sensorID = -1;
         EVENT::TrackerHitVec::const_iterator itr;
         for( itr = hits.begin(); itr != hits.end(); ++itr ) {
-            sensorID = Utility::GuessSensorID( *itr );
+						UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
+						const int sensorID = hitDecoder(static_cast< IMPL::TrackerHitImpl* >(*itr))["sensorID"];
             itMeasLayer = measLayers.find( sensorID );
             if ( itMeasLayer != measLayers.end() ) itMeasLayer->second->addHit( *itr );
             else {

@@ -47,14 +47,13 @@ elif [[ $modus == "gbl" ]]; then
 # Exhautsive and Helix track search results are not identical - to be investigated (perhaps trivially explained)
 
 #### jobsub.py  $DRY -c config.cfg -csv $RUNLIST tracksearchExh $i
- jobsub.py  $DRY -o MaxMissingHitsPerTrack="2"  -c config.cfg -csv $RUNLIST tracksearchHelix $i
+ jobsub.py  $DRY -o MaxMissingHitsPerTrack="0"  -c config.cfg -csv $RUNLIST tracksearchHelix $i
  jobsub.py  $DRY                                -c config.cfg -csv $RUNLIST gbltraj          $i
  jobsub.py  $DRY                                -c config.cfg -csv $RUNLIST gbltrajmille     $i
 # echo jobsub.py  $DRY -c config.cfg -csv $RUNLIST aligngbl $i
 #
 # bash alignm26.sh -r ${i} -l ${RUNLIST} -c 100
 # bash align1fei4.sh -r ${i} -l ${RUNLIST} -c 1000
-
 #### jobsub.py  $DRY -c config.cfg -csv $RUNLIST aligngbl $i
 #
 # 10 iterations to aligne 6 planes (6D)

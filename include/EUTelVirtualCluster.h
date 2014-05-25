@@ -38,7 +38,7 @@ namespace eutelescope {
 
   public:
     //! Default constructor
-    EUTelVirtualCluster(IMPL::TrackerDataImpl *) : _trackerData(NULL) { } 
+    EUTelVirtualCluster(IMPL::TrackerDataImpl* data) : _trackerData(data) { } 
 
     //! Default destructor
     virtual ~EUTelVirtualCluster() {;}
@@ -62,13 +62,6 @@ namespace eutelescope {
      *  @return The detector ID.
      */ 
     virtual int  getDetectorID() const = 0;
-
-    //! Return the cluster ID
-    /*! This number is used to enumerate clusters.
-     *
-     *  @return The cluster ID.
-     */ 
-    virtual int  getClusterID() const = 0;
 
     //! Get the seed pixel coordinate in the local FoR
     /*! Regardless the kind of cluster in use, it is always possible

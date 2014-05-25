@@ -10,14 +10,13 @@
  */
  
 // eutelescope includes ".h"
-#include "EUTelAPIXHotPixelKiller.h"
+#include "EUTelProcessorHotPixelFinder.h"
 #include "EUTELESCOPE.h"
 #include "EUTelRunHeaderImpl.h"
 #include "EUTelMatrixDecoder.h"
 #include "EUTelSparseDataImpl.h"
 #include "EUTelSparseClusterImpl.h"
 #include "EUTelSparseData2Impl.h"
-#include "EUTelSparseCluster2Impl.h"
 
 // marlin includes ".h"
 #include "marlin/Processor.h"
@@ -60,17 +59,17 @@ using namespace marlin;
 using namespace eutelescope;
 
 #if defined(USE_AIDA) || defined(MARLIN_USE_AIDA)
-string EUTelAPIXHotPixelKiller::_firing2DHistoName = "Firing2D";
-string EUTelAPIXHotPixelKiller::_firing1DHistoName = "Firing1D";
+string EUTelProcessorHotPixelFinder::_firing2DHistoName = "Firing2D";
+string EUTelProcessorHotPixelFinder::_firing1DHistoName = "Firing1D";
 #endif
 
 
-EUTelAPIXHotPixelKiller::EUTelAPIXHotPixelKiller () : Processor("EUTelAPIXHotPixelKiller") 
+EUTelProcessorHotPixelFinder::EUTelProcessorHotPixelFinder () : Processor("EUTelProcessorHotPixelFinder") 
 {
 
   // modify processor description
   _description =
-    "EUTelAPIXHotPixelKiller periodically check for pixel singing loud too often and remove them from the analysis";
+    "EUTelProcessorHotPixelFinder periodically check for pixel singing loud too often and remove them from the analysis";
 
 
   registerInputCollection (LCIO::TRACKERDATA, "ZSDataCollectionName",
@@ -117,7 +116,7 @@ EUTelAPIXHotPixelKiller::EUTelAPIXHotPixelKiller () : Processor("EUTelAPIXHotPix
 
 
 
-void EUTelAPIXHotPixelKiller::init () 
+void EUTelProcessorHotPixelFinder::init () 
 {
   // this method is called only once even when the rewind is active
   // usually a good idea to
@@ -143,13 +142,13 @@ void EUTelAPIXHotPixelKiller::init ()
 
 }
 
-void EUTelAPIXHotPixelKiller::modifyEvent( LCEvent * /*event*/ )
+void EUTelProcessorHotPixelFinder::modifyEvent( LCEvent * /*event*/ )
 {
   //This function does nothing, but must be included due to being inherited from an abstract base class
   return;
 }
 
-void EUTelAPIXHotPixelKiller::processRunHeader (LCRunHeader * rdr ) {
+void EUTelProcessorHotPixelFinder::processRunHeader (LCRunHeader * rdr ) {
 
   auto_ptr<EUTelRunHeaderImpl> runHeader ( new EUTelRunHeaderImpl ( rdr ) );
   runHeader->addProcessor( type() );
@@ -163,7 +162,7 @@ void EUTelAPIXHotPixelKiller::processRunHeader (LCRunHeader * rdr ) {
 }
 
 
-void EUTelAPIXHotPixelKiller::initializeGeometry( LCEvent * event ) 
+void EUTelProcessorHotPixelFinder::initializeGeometry( LCEvent * event ) 
 {
 
     LCCollectionVec * collection = dynamic_cast< LCCollectionVec *> ( event->getCollection( _statusCollectionName ) );
@@ -230,7 +229,7 @@ void EUTelAPIXHotPixelKiller::initializeGeometry( LCEvent * event )
 // 
 // this method will run only standalone
 // 
-void EUTelAPIXHotPixelKiller::HotPixelFinder(EUTelEventImpl  *evt)
+void EUTelProcessorHotPixelFinder::HotPixelFinder(EUTelEventImpl  *evt)
 {
     if (evt == 0 )
     {
@@ -257,9 +256,9 @@ void EUTelAPIXHotPixelKiller::HotPixelFinder(EUTelEventImpl  *evt)
         TrackerDataImpl * zsData = dynamic_cast< TrackerDataImpl * > ( zsInputCollectionVec->getElementAt( iDetector ) );
         SparsePixelType   type   = static_cast<SparsePixelType> ( static_cast<int> (cellDecoder( zsData )["sparsePixelType"]) );
 
-        if (type != kEUTelAPIXSparsePixel  ) 
+        if (type != kEUTelGenericSparsePixel  ) 
         {
-          std::cout << " pixel is not of APIX type " << std::endl ;
+          std::cout << " pixel is not of Geneneric type " << std::endl ;
         }
 
         int _sensorID            = static_cast<int > ( cellDecoder( zsData )["sensorID"] );
@@ -295,18 +294,18 @@ void EUTelAPIXHotPixelKiller::HotPixelFinder(EUTelEventImpl  *evt)
         EUTelMatrixDecoder matrixDecoder( noiseDecoder , noise );
 
         // now prepare the EUTelescope interface to sparsified data.  
-//old        auto_ptr<EUTelSparseDataImpl<EUTelSimpleSparsePixel > >  sparseData(new EUTelSparseDataImpl<EUTelSimpleSparsePixel> ( zsData ));
-        auto_ptr<EUTelSparseDataImpl<EUTelAPIXSparsePixel > > apixData(new EUTelSparseDataImpl<EUTelAPIXSparsePixel> ( zsData ));
+        // what's the point of this one ?
+        auto_ptr<EUTelSparseDataImpl<EUTelGenericSparsePixel > > sparseData(new EUTelSparseDataImpl<EUTelGenericSparsePixel> ( zsData ));
 
         streamlog_out ( DEBUG1 ) << "Processing sparse data on detector " << _sensorID << " with "
-                                 << apixData->size() << " pixels " << endl;
+                                 << sparseData->size() << " pixels " << endl;
         
-        for ( unsigned int iPixel = 0; iPixel < apixData->size(); iPixel++ ) 
+        for ( unsigned int iPixel = 0; iPixel < sparseData->size(); iPixel++ ) 
         {
-            // loop over all pixels in the apixData object.      
-            EUTelAPIXSparsePixel *sparsePixel =  new EUTelAPIXSparsePixel() ;
+            // loop over all pixels in the sparseData object.      
+            EUTelGenericSparsePixel *sparsePixel =  new EUTelGenericSparsePixel() ;
 
-            apixData->getSparsePixelAt( iPixel, sparsePixel );
+            sparseData->getSparsePixelAt( iPixel, sparsePixel );
             int decoded_XY_index = matrixDecoder.getIndexFromXY( sparsePixel->getXCoord(), sparsePixel->getYCoord() ); // unique pixel index !!
 
             if( _hitIndexMapVec[iDetector].find( decoded_XY_index ) == _hitIndexMapVec[iDetector].end() )
@@ -341,7 +340,7 @@ void EUTelAPIXHotPixelKiller::HotPixelFinder(EUTelEventImpl  *evt)
 
 
 
-void EUTelAPIXHotPixelKiller::processEvent (LCEvent * event) 
+void EUTelProcessorHotPixelFinder::processEvent (LCEvent * event) 
 {
 
     if( event == 0 )
@@ -351,6 +350,13 @@ void EUTelAPIXHotPixelKiller::processEvent (LCEvent * event)
     }
     
     if ( _iCycle > static_cast< unsigned short >( _totalNoOfCycle ) ) return;
+
+    if (_iEvt % 1000 == 0)
+        streamlog_out( MESSAGE4 ) << "Processing event "
+            << setw(6) << setiosflags(ios::right) << event->getEventNumber() << " in run "
+            << setw(6) << setiosflags(ios::right) << setfill('0')  << event->getRunNumber() << setfill(' ')
+            << " (Total = " << setw(10) << (_iCycle * _noOfEventPerCycle) + _iEvt << ")"
+            << resetiosflags(ios::left) << endl;
     
     EUTelEventImpl * evt = static_cast<EUTelEventImpl*> (event);
     if ( evt->getEventType() == kEORE ) 
@@ -476,7 +482,7 @@ void EUTelAPIXHotPixelKiller::processEvent (LCEvent * event)
 }
 
 
-void EUTelAPIXHotPixelKiller::end() {
+void EUTelProcessorHotPixelFinder::end() {
 
   streamlog_out ( MESSAGE4 ) << "Successfully finished" << endl;
   streamlog_out ( MESSAGE4 ) << printSummary() << endl;
@@ -484,7 +490,7 @@ void EUTelAPIXHotPixelKiller::end() {
 }
 
 
-string EUTelAPIXHotPixelKiller::printSummary() const {
+string EUTelProcessorHotPixelFinder::printSummary() const {
 
   stringstream ss;
   int bigSpacer   = 10;
@@ -522,7 +528,7 @@ string EUTelAPIXHotPixelKiller::printSummary() const {
 
 
 
-void EUTelAPIXHotPixelKiller::check( LCEvent * event ) 
+void EUTelProcessorHotPixelFinder::check( LCEvent * event ) 
 {
 
     if ( _iCycle > static_cast< unsigned short >( _totalNoOfCycle ) )
@@ -588,14 +594,14 @@ void EUTelAPIXHotPixelKiller::check( LCEvent * event )
 }
 
 
-void EUTelAPIXHotPixelKiller::HotPixelDBWriter(LCEvent *input_event)
+void EUTelProcessorHotPixelFinder::HotPixelDBWriter(LCEvent *input_event)
 {    
 //    lccd::DBInterface dbinterface =  lccd::DBInterface("m26", false);
 //    lccd::LCCDTimeStamp timestampe= lccd::LCCDTimeStamp();
 //    dbinterface.createSimpleFile 	( timestampe, 	"tag1 ");
 //return;
 
-    streamlog_out ( MESSAGE5 ) << "EUTelAPIXHotPixelKiller::HotPixelDBWriter " << endl;
+    streamlog_out ( MESSAGE5 ) << "EUTelProcessorHotPixelFinder::HotPixelDBWriter " << endl;
     streamlog_out ( MESSAGE5 ) << "writing out hot pixel db into " << _hotpixelDBFile.c_str() << endl;
 
     // create data decoder
@@ -631,7 +637,7 @@ void EUTelAPIXHotPixelKiller::HotPixelDBWriter(LCEvent *input_event)
           event = new LCEventImpl;
           event->setRunNumber( 0 );
           event->setEventNumber( 0 );
-          event->setDetectorName("APIX");
+          event->setDetectorName("PixelDetecor");
           streamlog_out ( MESSAGE5 ) << "event created ok"  << endl;       
 
           now   = new LCTime;
@@ -663,7 +669,7 @@ void EUTelAPIXHotPixelKiller::HotPixelDBWriter(LCEvent *input_event)
            event = new LCEventImpl;
            event->setRunNumber( 0 );
            event->setEventNumber( 0 );
-           event->setDetectorName("APIX");
+           event->setDetectorName("PixelDetector");
            streamlog_out ( MESSAGE5 ) << "event recreated ok"  << endl;       
 
            now   = new LCTime;
@@ -722,15 +728,15 @@ void EUTelAPIXHotPixelKiller::HotPixelDBWriter(LCEvent *input_event)
          
         CellIDEncoder< TrackerDataImpl > hotPixelEncoder  ( eutelescope::EUTELESCOPE::ZSDATADEFAULTENCODING, hotPixelCollection  );
         hotPixelEncoder["sensorID"]        = sensorID;
-        hotPixelEncoder["sparsePixelType"] = eutelescope::kEUTelAPIXSparsePixel;
+        hotPixelEncoder["sparsePixelType"] = eutelescope::kEUTelGenericSparsePixel;
 
         // prepare a new TrackerData for the hot Pixel data
         std::auto_ptr<lcio::TrackerDataImpl > currentFrame( new lcio::TrackerDataImpl );
         hotPixelEncoder.setCellID( currentFrame.get() );
 
         // this is the structure that will host the sparse pixel  
-        std::auto_ptr< eutelescope::EUTelSparseDataImpl< eutelescope::EUTelAPIXSparsePixel > >
-            sparseFrame( new eutelescope::EUTelSparseDataImpl< eutelescope::EUTelAPIXSparsePixel > ( currentFrame.get() ) );
+        std::auto_ptr< eutelescope::EUTelSparseDataImpl< eutelescope::EUTelGenericSparsePixel > >
+            sparseFrame( new eutelescope::EUTelSparseDataImpl< eutelescope::EUTelGenericSparsePixel > ( currentFrame.get() ) );
 
         for ( unsigned int iPixel = 0; iPixel < _firingFreqVec[iDetector].size(); iPixel++ ) 
         {
@@ -782,7 +788,7 @@ void EUTelAPIXHotPixelKiller::HotPixelDBWriter(LCEvent *input_event)
 
 #if defined(USE_AIDA) || defined(MARLIN_USE_AIDA)
 
-void EUTelAPIXHotPixelKiller::bookAndFillHistos() 
+void EUTelProcessorHotPixelFinder::bookAndFillHistos() 
 {
 
   streamlog_out ( MESSAGE0 ) << "Booking and filling histograms for cycle " << _iCycle << endl;

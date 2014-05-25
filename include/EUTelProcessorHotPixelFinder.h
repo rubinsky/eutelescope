@@ -11,7 +11,7 @@
 
 // eutelescope includes ".h"
 #include "EUTelEventImpl.h"
-#include "EUTelAPIXSparsePixel.h"
+#include "EUTelGenericSparsePixel.h"
 
 // marlin includes ".h"
 #include "marlin/EventModifier.h"
@@ -60,27 +60,27 @@ namespace eutelescope {
    *
    */
 
-  class EUTelAPIXHotPixelKiller : public marlin::Processor, public marlin::EventModifier  {
+  class EUTelProcessorHotPixelFinder : public marlin::Processor, public marlin::EventModifier  {
 
   public:
 
 
-    //! Returns a new instance of EUTelAPIXHotPixelKiller
+    //! Returns a new instance of EUTelProcessorHotPixelFinder
     /*! This method returns an new instance of the this processor.  It
      *  is called by Marlin execution framework and it shouldn't be
      *  called/used by the final user.
      *
-     *  @return a new EUTelAPIXHotPixelKiller.
+     *  @return a new EUTelProcessorHotPixelFinder.
      */
     virtual Processor * newProcessor() {
-      return new EUTelAPIXHotPixelKiller;
+      return new EUTelProcessorHotPixelFinder;
     }
 
     virtual const std::string & name() const { return Processor::name() ; }
 
 
     //! Default constructor
-    EUTelAPIXHotPixelKiller ();
+    EUTelProcessorHotPixelFinder ();
 
     //! Called at the job beginning.
     /*! This is executed only once in the whole execution. It prints
@@ -243,10 +243,10 @@ namespace eutelescope {
      *  For each Detector unique ID element a map of pixels is created. 
      *  Key is a (sensor) unique pixel Id (to be addressed via
      *  _inverse_hitIndexMapVec)
-     *  Value - EUTelAPIXSparsePixel pointer.
+     *  Value - EUTelGenericSparsePixel pointer.
      */
     
-    std::vector< std::map< int, EUTelAPIXSparsePixel* > > _pixelMapVec;
+    std::vector< std::map< int, EUTelGenericSparsePixel* > > _pixelMapVec;
 
 
 
@@ -324,7 +324,7 @@ namespace eutelescope {
   };
 
   //! A global instance of the processor
-  EUTelAPIXHotPixelKiller gEUTelAPIXHotPixelKiller;
+  EUTelProcessorHotPixelFinder gEUTelProcessorHotPixelFinder;
 
 }
 #endif

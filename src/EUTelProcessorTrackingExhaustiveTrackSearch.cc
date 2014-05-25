@@ -33,7 +33,6 @@
 #include "EUTelExhaustiveTrackFinder.h"
 #include "EUTelGeometryTelescopeGeoDescription.h"
 // Cluster types
-#include "EUTelSparseCluster2Impl.h"
 #include "EUTelSparseClusterImpl.h"
 #include "EUTelBrickedClusterImpl.h"
 #include "EUTelDFFClusterImpl.h"
@@ -41,6 +40,7 @@
 
 
 using namespace lcio;
+using namespace std;
 using namespace marlin;
 using namespace eutelescope;
 
@@ -289,11 +289,13 @@ void EUTelProcessorTrackingExhaustiveTrackSearch::processEvent(LCEvent * evt) {
 
         streamlog_out(MESSAGE0) << "All hits in event start:==============" << std::endl;
        vector< EVENT::TrackerHitVec >::const_iterator itPlane;
+				UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
 	for ( itPlane = allHitsVec.begin() ; itPlane != allHitsVec.end(); ++itPlane ) {
             EVENT::TrackerHitVec::const_iterator itHits;
             for ( itHits = (*itPlane).begin(); itHits != (*itPlane).end(); ++itHits ) {
                 const double* uvpos = (*itHits)->getPosition();
-		streamlog_out(MESSAGE0) << "Hit (id=" << Utility::GuessSensorID(*itHits) << ") local(u,v) coordinates: (" << uvpos[0] << "," << uvpos[1] << ")" << std::endl;
+						const int sensorID = hitDecoder(static_cast< IMPL::TrackerHitImpl* >((*itHits)))["sensorID"];
+		streamlog_out(MESSAGE0) << "Hit (id=" << sensorID << ") local(u,v) coordinates: (" << uvpos[0] << "," << uvpos[1] << ")" << std::endl;
             }
 	}
 	streamlog_out(MESSAGE0) << "All hits in event end:==============" << std::endl;
@@ -383,18 +385,18 @@ int EUTelProcessorTrackingExhaustiveTrackSearch::FillHits(LCEvent * evt,
 
             // now we know the pixel type. So we can properly create a new
             // instance of the sparse cluster
-            if (pixelType == kEUTelSimpleSparsePixel) {
-                cluster = new EUTelSparseClusterImpl< EUTelSimpleSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
-            } else if (pixelType == kEUTelAPIXSparsePixel) {
-                cluster = new EUTelSparseClusterImpl<EUTelAPIXSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
-            } else {
+            if (pixelType == kEUTelGenericSparsePixel) {
+                cluster = new EUTelSparseClusterImpl< EUTelGenericSparsePixel > (static_cast<TrackerDataImpl *> (clusterVector[ 0 ]));
+            } 
+	    else {
                 streamlog_out(ERROR4) << "Unknown pixel type.  Sorry for quitting." << std::endl;
                 throw UnknownDataTypeException("Pixel type unknown");
             }
             delete cluster; // <--- destroying the cluster
         }
 
-        const int localSensorID = Utility::GuessSensorID( hit );  // localSensorID == -1, if detector ID was not found
+				UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
+				const int localSensorID = hitDecoder(hit)["sensorID"];
         const int numberAlongZ = geo::gGeometry().sensorIDtoZOrder( localSensorID );
         if ( localSensorID >= 0 ) allHitsArray[ numberAlongZ ].push_back( hit );
         if ( localSensorID >= 0 ) allHitsVec[ numberAlongZ ].push_back( hit );

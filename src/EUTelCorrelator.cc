@@ -465,8 +465,8 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
 
           // now we know the pixel type. So we can properly create a new
           // instance of the sparse cluster
-          if ( pixelType == kEUTelSimpleSparsePixel ) {
-            externalCluster = new EUTelSparseClusterImpl< EUTelSimpleSparsePixel >
+          if ( pixelType == kEUTelGenericSparsePixel ) {
+            externalCluster = new EUTelSparseClusterImpl< EUTelGenericSparsePixel >
               ( static_cast<TrackerDataImpl *> ( externalPulse->getTrackerData()  ) );
           } else {
             streamlog_out ( ERROR4 ) << "Unknown pixel type.  Sorry for quitting." << endl;
@@ -479,11 +479,8 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
               continue;
           }
 
-       } else if ( type == kEUTelAPIXClusterImpl ) {
-            externalCluster = new EUTelSparseClusterImpl< EUTelAPIXSparsePixel >
-              ( static_cast<TrackerDataImpl *> ( externalPulse->getTrackerData()  ) );
- 
-        } else  continue;
+       }
+	else  continue;
 
         int externalSensorID = pulseCellDecoder( externalPulse ) [ "sensorID" ] ;
  
@@ -542,8 +539,8 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
 
             // now we know the pixel type. So we can properly create a new
             // instance of the sparse cluster
-            if ( pixelType == kEUTelSimpleSparsePixel ) {
-              internalCluster = new EUTelSparseClusterImpl< EUTelSimpleSparsePixel >
+            if ( pixelType == kEUTelGenericSparsePixel ) {
+              internalCluster = new EUTelSparseClusterImpl< EUTelGenericSparsePixel >
                 ( static_cast<TrackerDataImpl *> ( internalPulse->getTrackerData()  ) );
             } else {
               streamlog_out ( ERROR4 ) << "Unknown pixel type.  Sorry for quitting." << endl;
@@ -556,11 +553,8 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
                 continue;
             }
  
-          } else if ( type == kEUTelAPIXClusterImpl ) {
-            internalCluster = new EUTelSparseClusterImpl< EUTelAPIXSparsePixel >
-              ( static_cast<TrackerDataImpl *> ( internalPulse->getTrackerData()  ) );
- 
-          } else  continue;
+          }
+	   else  continue;
 
           if( internalCluster->getTotalCharge() < _clusterChargeMin )
           {
@@ -630,10 +624,12 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
 
     if ( _hasHitCollection ) {
 
-      LCCollectionVec * inputHitCollection = static_cast< LCCollectionVec *>
-        ( event->getCollection( _inputHitCollectionName )) ;
+
+      LCCollectionVec* inputHitCollection = static_cast<LCCollectionVec*>( event->getCollection(_inputHitCollectionName) );
+      UTIL::CellIDDecoder<TrackerHitImpl> hitDecoder ( EUTELESCOPE::HITENCODING );
 
       streamlog_out  ( MESSAGE2 ) << "inputHitCollection " << _inputHitCollectionName.c_str() << endl;
+
 
       for ( size_t iExt = 0 ; iExt < inputHitCollection->size(); ++iExt ) {
         std::vector<double> trackX;
@@ -644,14 +640,13 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
        trackY.clear();
        iplane.clear();
 
-
         // this is the external hit
-        TrackerHitImpl * externalHit = static_cast< TrackerHitImpl * > ( inputHitCollection->
-                                                                         getElementAt( iExt ) );
 
-        double* externalPosition =  const_cast<double*> ( externalHit->getPosition() );
+        TrackerHitImpl* externalHit = static_cast<TrackerHitImpl*>( inputHitCollection->getElementAt(iExt) );
+        
+	double* externalPosition = const_cast<double*>( externalHit->getPosition() );
 
-        int externalSensorID  = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >( externalHit ) );
+        int externalSensorID = hitDecoder( externalHit )["sensorID"]; 
 
         double etrackPointLocal[]  = { externalPosition[0], externalPosition[1], externalPosition[2] };
         double etrackPointGlobal[] = { externalPosition[0], externalPosition[1], externalPosition[2] };
@@ -673,16 +668,18 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
         for ( size_t iInt = 0; iInt < inputHitCollection->size(); ++iInt ) 
         {
 
-          TrackerHitImpl  * internalHit = static_cast< TrackerHitImpl * > ( inputHitCollection->
-                                                                            getElementAt( iInt ) );
-          double * internalPosition = const_cast<double* >( internalHit->getPosition() );
 
-          int internalSensorID = Utility::GuessSensorID( static_cast< IMPL::TrackerHitImpl* >( internalHit ) );
+          TrackerHitImpl* internalHit = static_cast<TrackerHitImpl*>( inputHitCollection->getElementAt(iInt) );
 
-// rubinsky 18-02-14: implementing reading out of the local Hit collection information
-// - define plane ID via Utility::
-// - define hit global telescope frame [3] coord via EUTelGeometry:::
-//
+          double* internalPosition = const_cast<double*>( internalHit->getPosition() );
+
+          int internalSensorID = hitDecoder( internalHit )["sensorID"]; 
+
+          bool ishot = hitContainsHotPixels(internalHit); 
+
+          if( ishot ) continue;
+   
+
           double itrackPointLocal[]  = { internalPosition[0], internalPosition[1], internalPosition[2] };
           double itrackPointGlobal[] = { internalPosition[0], internalPosition[1], internalPosition[2] };
 // do local2Master only if the externalHit is defined in the local frame of the module:  
@@ -690,6 +687,7 @@ void EUTelCorrelator::processEvent (LCEvent * event) {
 // steer by a processor flag ?
           geo::gGeometry().local2Master( internalSensorID, itrackPointLocal, itrackPointGlobal );
  
+
           if ( 
                   ( internalSensorID != getFixedPlaneID() && externalSensorID == getFixedPlaneID() )
                    ||
@@ -1569,7 +1567,71 @@ std::vector<double> EUTelCorrelator::guessSensorOffset(int internalSensorID, int
       return cluster_offset;
 }
 
+
+void  EUTelCorrelator::FillHotPixelMap(LCEvent *event)
+{
+    LCCollectionVec *hotPixelCollectionVec = 0;
+    try 
+    {
+      hotPixelCollectionVec = static_cast< LCCollectionVec* > ( event->getCollection( _hotPixelCollectionName  ) );
+      streamlog_out ( DEBUG5 ) << "Hotpixel collection " << _hotPixelCollectionName.c_str() << " found" << endl; 
+    }
+    catch (...)
+    {
+      streamlog_out ( MESSAGE5 ) << "Hotpixel collection " << _hotPixelCollectionName.c_str() << " not found" << endl; 
+      return;
+    }
+
+        CellIDDecoder<TrackerDataImpl> cellDecoder( hotPixelCollectionVec );
+	
+        for(int i=0; i<  hotPixelCollectionVec->getNumberOfElements(); i++)
+        {
+           TrackerDataImpl* hotPixelData = dynamic_cast< TrackerDataImpl *> ( hotPixelCollectionVec->getElementAt( i ) );
+	   SparsePixelType  type         = static_cast<SparsePixelType> (static_cast<int> (cellDecoder( hotPixelData )["sparsePixelType"]));
+	   int sensorID              = static_cast<int > ( cellDecoder( hotPixelData )["sensorID"] );
+       }
+
+}
  
+
+bool EUTelCorrelator::hitContainsHotPixels( TrackerHitImpl   * hit) 
+{
+
+        try
+        {
+            LCObjectVec clusterVector = hit->getRawHits();
+
+						 // EUTelVirtualCluster * cluster;
+            if ( hit->getType() == kEUTelBrickedClusterImpl ) {
+               // fixed cluster implementation. Remember it
+               //  can come from
+               //  both RAW and ZS data
+   
+//              cluster = new EUTelBrickedClusterImpl(static_cast<TrackerDataImpl *> ( clusterVector[0] ) );
+                
+            } else if ( hit->getType() == kEUTelDFFClusterImpl ) {
+              
+              // fixed cluster implementation. Remember it can come from
+              // both RAW and ZS data
+//              cluster = new EUTelDFFClusterImpl( static_cast<TrackerDataImpl *> ( clusterVector[0] ) );
+            } else if ( hit->getType() == kEUTelFFClusterImpl ) {
+              
+              // fixed cluster implementation. Remember it can come from
+              // both RAW and ZS data
+//              cluster = new EUTelFFClusterImpl( static_cast<TrackerDataImpl *> ( clusterVector[0] ) );
+            } 
+       }
+       catch(...)
+       { 
+          printf("something went wrong in EUTelCorrelator::hitContainsHotPixels \n");
+          // if anything went wrong in the above return FALSE, meaning do not skip this hit
+          return 0;
+       }
+ 
+       // if none of the above worked return FALSE, meaning do not skip this hit
+       return 0;
+
+}
 
 
 

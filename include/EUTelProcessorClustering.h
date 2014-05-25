@@ -1,7 +1,7 @@
 // Version: $Id$
 
-#ifndef EUTELAPIXCLUSTERINGPROCESSOR_H
-#define EUTELAPIXCLUSTERINGPROCESSOR_H 1
+#ifndef EUTELPROCESSORCLUSTERING_H
+#define EUTELPROCESSORCLUSTERING_H 1
 
 // since v00-00-09 built only if GEAR is available
 #ifdef USE_GEAR
@@ -38,15 +38,15 @@
 namespace eutelescope {
 
 
-  class EUTelAPIXClusteringProcessor : public marlin::Processor , public marlin::EventModifier {
+  class EUTelProcessorClustering : public marlin::Processor , public marlin::EventModifier {
 
   public:
     
     virtual Processor * newProcessor() {
-      return new EUTelAPIXClusteringProcessor;
+      return new EUTelProcessorClustering;
     }
     
-    EUTelAPIXClusteringProcessor();
+    EUTelProcessorClustering();
 
     virtual const std::string & name() const { return Processor::name() ; }
     virtual void init ();
@@ -127,7 +127,7 @@ namespace eutelescope {
   };
 
   //! A global instance of the processor
-  EUTelAPIXClusteringProcessor gEUTelAPIXClusteringProcessor;
+  EUTelProcessorClustering gEUTelProcessorClustering;
 
 }
 #endif // USE_GEAR
