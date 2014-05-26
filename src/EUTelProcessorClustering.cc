@@ -15,9 +15,8 @@
 #include "EUTelExceptions.h"
 #include "EUTelHistogramManager.h"
 #include "EUTelMatrixDecoder.h"
-#include "EUTelSparseDataImpl.h"
+#include "EUTelTrackerDataInterfacerImpl.h"
 #include "EUTelSparseClusterImpl.h"
-#include "EUTelSparseData2Impl.h"
 
 
 // gear includes <.h>
@@ -335,7 +334,7 @@ void EUTelProcessorClustering::Clustering(LCEvent * evt, LCCollectionVec * clust
 		
 	        if (type == kEUTelGenericSparsePixel  ) 
                 {
-			auto_ptr<EUTelSparseDataImpl<EUTelGenericSparsePixel > > sparseData(new EUTelSparseDataImpl<EUTelGenericSparsePixel> ( zsData ));
+			auto_ptr<EUTelTrackerDataInterfacerImpl<EUTelGenericSparsePixel > > sparseData(new EUTelTrackerDataInterfacerImpl<EUTelGenericSparsePixel> ( zsData ));
 			streamlog_out ( MESSAGE1 ) << "Processing data on detector " << sensorID << " with " << sparseData->size() << " pixels " << endl;
 			// loop over all pixels in the sparseData object.
 			std::vector<EUTelGenericSparsePixel*> genericPixelVec;
