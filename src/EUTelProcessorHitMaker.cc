@@ -205,8 +205,8 @@ void EUTelProcessorHitMaker::DumpReferenceHitDB()
 
     refhit->setSensorID( sensorID );
     refhit->setXOffset( geo::gGeometry().siPlaneXPosition( sensorID ) );
-    refhit->setYOffset( geo::gGeometry().siPlaneYPosition(sensorID) );
-    refhit->setZOffset( geo::gGeometry().siPlaneZPosition(sensorID) ; // + 0.5*geo::gGeometry().siPlaneZSize(sensorID) );
+    refhit->setYOffset( geo::gGeometry().siPlaneYPosition( sensorID ) );
+    refhit->setZOffset( geo::gGeometry().siPlaneZPosition( sensorID ) ); // + 0.5*geo::gGeometry().siPlaneZSize(sensorID) );
     
     refVec[0] = 0.;
     refVec[1] = 0.;
