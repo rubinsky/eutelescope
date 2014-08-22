@@ -18,11 +18,11 @@
    <execute>
       <processor name="AIDA"/>
       <processor name="LoadDB"/>
-      <processor name="ApplyPreAlignment"/>
-      <processor name="ApplyAlignment"/>
+      <xprocessor name="ApplyPreAlignment"/>
+      <xprocessor name="ApplyAlignment"/>
       <group name="TelDUTFitter"/>
-      <group name="TelDUTTransferToLocalCoordinates"/>
-      <group name="TelDUTHistos"/>
+      <xgroup name="TelDUTTransferToLocalCoordinates"/>
+      <xgroup name="TelDUTHistos"/>
       <processor name="MyEUTelUtilityPrintEventNumber"/>
       <processor name="Save"/>
    </execute>
@@ -59,21 +59,23 @@
   <!--Initialization of a data file handler-->
   <!--parameter name="DataFileHandler" type="StringVec" value="conditionsName"/-->
   <!--Initialization of a simple conditions file handler-->
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit01 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit02 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit11 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit12 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit21 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit22 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit31 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit32 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit41 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit42 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit51 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> refhit52 @DatabasePath@/@FilePrefix@-referencehit.slcio referenceHit </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> prealign  @DatabasePath@/@FilePrefix@-prealignment.slcio alignment </parameter>
-  <parameter name="SimpleFileHandler" type="StringVec"> align @DatabasePath@/@FilePrefix@-alignment.slcio alignment </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit01 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit02 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit11 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit12 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit21 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit22 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit31 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit32 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit41 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit42 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit51 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> refhit52 @DatabasePath@/@FilePrefix@-refhit-db.slcio referenceHit </parameter>
+<!--
+  <parameter name="SimpleFileHandler" type="StringVec"> prealign  @DatabasePath@/@FilePrefix@-prealign-db.slcio alignment </parameter>
+  <parameter name="SimpleFileHandler" type="StringVec"> align @DatabasePath@/@FilePrefix@-align-db.slcio alignment </parameter>
+-->
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
   <!--parameter name="Verbosity" type="string" value=""/-->
 </processor>
@@ -186,7 +188,7 @@
   <!--Should plots be made and filled?-->
   <!--parameter name="AddToLCIO" type="bool" value="true"/-->
   <!--Names of alignment collections, should be in same order as application-->
-  <parameter name="AlignmentCollectionNames" type="StringVec" value="prealign align"/>
+  <parameter name="AlignmentCollectionNames" type="StringVec" value=" "/>
   <!--DAF fitter: The cutoff value for a measurement to be included in the fit.-->
   <parameter name="Chi2Cutoff" type="float" value="1000"/>
   <!--List of sensor IDs for the DUT planes. Used to make the decision on whether ro accept the track or not. These planes are not used in track finder, and not in the track fitter unless option 'useDutsInFit' is set.-->
@@ -202,7 +204,7 @@
   <!--Set this to true if you want DUTs to be included in the track fit-->
   <parameter name="FitDuts" type="bool" value="false"/>
   <!--Names of input hit collections-->
-  <parameter name="HitCollectionName" type="StringVec" value="alignedHit"/>
+  <parameter name="HitCollectionName" type="StringVec" value="hit"/>
   <!--Should plots be made and filled?-->
   <parameter name="MakePlots" type="bool" value="true"/>
   <!--Maximum allowed global chi2/ndof-->
@@ -309,7 +311,7 @@
 
   <processor name="ApplyAlignmentFitHits00" type="EUTelApplyAlignmentProcessor">
     <!--The name of the input hit collection-->
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits0 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits0  </parameter>
     <!--List of hit collections. First one is INPUT collection, every subsequent corresponds to applying alignment collection-->
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits0 prealignedfithits0 </parameter>
     <!--List of refhit collections. First one is INPUT collection, every subsequent corresponds to applying alignment collection-->
@@ -317,31 +319,31 @@
   </processor>
 
   <processor name="ApplyAlignmentFitHits01" type="EUTelApplyAlignmentProcessor">
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits1 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits1  </parameter>
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits1 prealignedfithits1 </parameter>
     <parameter name="refhitCollectionNames" type="StringVec"> refhit12 refhit11 </parameter>
   </processor>
 
   <processor name="ApplyAlignmentFitHits02" type="EUTelApplyAlignmentProcessor">
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits2 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits2  </parameter>
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits2 prealignedfithits2 </parameter>
     <parameter name="refhitCollectionNames" type="StringVec"> refhit22 refhit21 </parameter>
   </processor>
 
   <processor name="ApplyAlignmentFitHits03" type="EUTelApplyAlignmentProcessor">
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits3 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits3  </parameter>
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits3 prealignedfithits3 </parameter>
     <parameter name="refhitCollectionNames" type="StringVec"> refhit32 refhit31 </parameter>
   </processor>
 
   <processor name="ApplyAlignmentFitHits04" type="EUTelApplyAlignmentProcessor">
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits4 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits4  </parameter>
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits4 prealignedfithits4 </parameter>
     <parameter name="refhitCollectionNames" type="StringVec"> refhit42 refhit41 </parameter>
   </processor>
 
   <processor name="ApplyAlignmentFitHits05" type="EUTelApplyAlignmentProcessor">
-    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits5 alignedHit </parameter>
+    <parameter name="InputHitCollectionName" type="StringVec" lcioInType="TrackerHit"> fithits5  </parameter>
     <parameter name="hitCollectionNames" type="StringVec"> gearfithits5 prealignedfithits5 </parameter>
     <parameter name="refhitCollectionNames" type="StringVec"> refhit52 refhit51 </parameter>
   </processor>
@@ -353,7 +355,7 @@
 <group name="TelDUTHistos" >
  <!--Analysis of DUT performance based on the analytic track fit results-->
   <!--Name of the input DUT hit collection-->
-  <parameter name="InputHitCollectionName" type="string" lcioInType="TrackerHit"> alignedHit </parameter>
+  <parameter name="InputHitCollectionName" type="string" lcioInType="TrackerHit">  </parameter>
   <!--Name of the input DUT hit collection-->
   <parameter name="InputRecHitCollectionName" type="string" lcioInType="TrackerHit"> hit </parameter>
   <!--Alignment corrections for DUT: shift (in mm) in X, Y and rotation around Z-->
