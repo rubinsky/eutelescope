@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONFIG=config-1fei4.cfg
+CONFIG=config-1fei4-2.cfg
 #first="3546"
 #last="3546"
 

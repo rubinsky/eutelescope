@@ -342,8 +342,8 @@ void EUTelMille::init() {
   }
 
 //  sensor-planes in geometry navigation:
-  _siPlanesParameters  = const_cast<gear::SiPlanesParameters* > (&(Global::GEAR->getSiPlanesParameters()));
-  _siPlanesLayerLayout = const_cast<gear::SiPlanesLayerLayout*> ( &(_siPlanesParameters->getSiPlanesLayerLayout() ));
+//  _siPlanesParameters  = const_cast<gear::SiPlanesParameters* > (&(Global::GEAR->getSiPlanesParameters()));
+//  _siPlanesLayerLayout = const_cast<gear::SiPlanesLayerLayout*> ( &(_siPlanesParameters->getSiPlanesLayerLayout() ));
 
   // clear the sensor ID vector
   _sensorIDVec.clear();
@@ -356,8 +356,9 @@ void EUTelMille::init() {
   _sensorIDVecZOrder.clear();
 
 // copy-paste from another class (should be ideally part of GEAR!)
-   double*   keepZPosition = new double[ _siPlanesLayerLayout->getNLayers() ];
-   for ( int iPlane = 0 ; iPlane < _siPlanesLayerLayout->getNLayers(); iPlane++ ) 
+/*
+   double*   keepZPosition = new double[ geo::gGeometry().nPlanes ];
+   for ( int iPlane = 0 ; iPlane < geo::gGeometry().nPlanes ; iPlane++ ) 
    {
     int sensorID = _siPlanesLayerLayout->getID( iPlane );
         keepZPosition[ iPlane ] = _siPlanesLayerLayout->getLayerPositionZ(iPlane);
@@ -380,7 +381,7 @@ void EUTelMille::init() {
    }
    
    delete [] keepZPosition;
-
+*/
 
   _histogramSwitch = true;
 
@@ -436,13 +437,13 @@ void EUTelMille::init() {
     }
   
   // an associative map for getting also the sensorID ordered
+
   map< double, int > sensorIDMap;
   //lets create an array with the z positions of each layer
   for ( int iPlane = 0 ; iPlane < _siPlanesLayerLayout->getNLayers(); iPlane++ ) {
     _siPlaneZPosition.push_back(_siPlanesLayerLayout->getLayerPositionZ(iPlane));
     sensorIDMap.insert( make_pair( _siPlanesLayerLayout->getLayerPositionZ(iPlane), _siPlanesLayerLayout->getID(iPlane) ) );
   }
-
 
   //lets sort the array with increasing z
   sort(_siPlaneZPosition.begin(), _siPlaneZPosition.end());
